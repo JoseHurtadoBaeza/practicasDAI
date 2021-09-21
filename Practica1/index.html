@@ -1,12 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Práctica 1 - Una página web con HTML5</title>
+
+    <script type="text/javascript">
+        function changeCSS(cssFile) {
+        var oldlink = document.getElementById("estilo");
+        var newlink = document.createElement("link")
+        newlink.setAttribute("rel", "stylesheet");
+        newlink.setAttribute("type", "text/css");
+        newlink.setAttribute("id", "estilo");
+        newlink.setAttribute("href", cssFile);
+        document.getElementsByTagName("head")[0].replaceChild(newlink, oldlink);
+        }
+    </script>    
+
+    <link id="estilo" rel="stylesheet" type="text/css" href="./css/normal.css">
+
 </head>
 <body>
+
     
+    <footer>
+        <a href="#" onclick="changeCSS('./css/normal.css');">Vista normal</a> |
+        <a href="#" onclick="changeCSS('./css/compact.css');">Vista compacta</a>
+    </footer>
 </body>
 </html>

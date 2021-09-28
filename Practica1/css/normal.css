@@ -1,0 +1,26 @@
+body {
+    font-family: 'Droid-Serif', serif;
+    counter-reset: section;
+}
+
+.bloque {
+    background-color: whitesmoke;
+    border: 1px solid lightgray;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+    box-shadow: 6px 6px 3px slategray;
+}
+
+.pregunta {
+    counter-increment: section;
+    content: "Pregunta " counter(section);
+}
+
+.respuesta[data-valor="true"]:after {
+    content: "Verdadero";
+} 
+
+.respuesta[data-valor="false"]:after {
+    content: "Falso";
+}

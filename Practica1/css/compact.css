@@ -1,0 +1,22 @@
+body {
+    font-family: 'Ubuntu';
+    counter-reset: section;
+}
+
+.bloque {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.pregunta {
+    counter-increment: section;
+    content: counter(section) ". ";
+}
+
+.respuesta[data-valor="true"]:before {
+    content: "V";
+}
+
+.respuesta[data-valor="false"]:before {
+    content: "F";
+}

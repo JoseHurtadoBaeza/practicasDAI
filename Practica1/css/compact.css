@@ -1,6 +1,5 @@
 body {
-    font-family: 'Ubuntu';
-    counter-reset: section;
+    font-family: 'Ubuntu', sans-serif;
 }
 
 .bloque {
@@ -8,15 +7,27 @@ body {
     margin-bottom: 20px;
 }
 
-.pregunta {
+main section {
+    counter-reset: section;
+}
+
+.pregunta:before{
     counter-increment: section;
     content: counter(section) ". ";
 }
 
-.respuesta[data-valor="true"]:before {
+.pregunta{
+    display: inline;
+}
+
+.respuesta{
+    display: inline;
+}
+
+.respuesta[data-valor="true"]:after {
     content: "V";
 }
 
-.respuesta[data-valor="false"]:before {
+.respuesta[data-valor="false"]:after {
     content: "F";
 }

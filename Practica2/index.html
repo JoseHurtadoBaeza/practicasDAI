@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Práctica 1 - Una página web con HTML5</title>
+
+    <script type="text/javascript">
+        function changeCSS(cssFile) {
+        var oldlink = document.getElementById("estilo");
+        var newlink = document.createElement("link")
+        newlink.setAttribute("rel", "stylesheet");
+        newlink.setAttribute("type", "text/css");
+        newlink.setAttribute("id", "estilo");
+        newlink.setAttribute("href", cssFile);
+        document.getElementsByTagName("head")[0].replaceChild(newlink, oldlink);
+        }
+    </script>    
+
+    <link href='https://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'>
+
+    <link id="estilo" rel="stylesheet" type="text/css" href="./css/comun.css">
+
+</head>
+<body>
+
+    <header>
+
+        <h1>qÜestiona</h1>
+        <p>qÜestiona es una aplicación web que permite gestionar cuestionarios sobre un determinado tema en el que las posibles respuestas son</p>
+        <p>verdadero o falso. La aplicación se desarrolla como parte de las prácticas de la asignatura Desarrollo de Aplicaciones en Internet del Grado</p>
+        <p>en Ingeniería Informática de la Universitat d'Alacant.</p>
+
+        <nav>
+            <ul>
+                
+            </ul>
+        </nav>
+
+    </header>
+    
+    <main>
+
+        <section id="paris">
+
+            <h2>
+                <img src="./img/paris.jpg" alt="Una imagen representativa de París">
+                Cuestionario sobre París
+            </h2>
+
+            <div class="bloque">
+                <div class="pregunta">
+                La ciudad de París se sitúa a ambos lados del río Sena.
+                </div>
+                <div class="respuesta" data-valor="true">
+                </div>
+            </div>
+
+            <div class="bloque">
+                <div class="pregunta">
+                La Basílica del Sacré C&#339;ur es la única iglesia de Montmartre.
+                </div>
+                <div class="respuesta" data-valor="false">
+                </div>
+            </div>
+
+            <div class="bloque">
+                <div class="pregunta">
+                París se divide administrativamente en 20 distritos o <span>arrondissements.</span>
+                </div>
+                <div class="respuesta" data-valor="true">
+                </div>
+            </div>
+
+        </section>
+
+        <section id="londres">
+
+            <h2>
+                <img src="./img/londres.jpeg" alt="Una imagen representativa de Londres">
+                Cuestionario sobre Londres
+            </h2>
+
+            <div class="bloque">
+                <div class="pregunta">
+                Trafalgar Square es uno de los cuatro enclaves declarados 
+                Patrimonio de la Humanidad por la Unesco con los que cuenta Londres.
+                </div>
+                <div class="respuesta" data-valor="false">
+                </div>
+            </div>
+
+            <div class="bloque">
+                <div class="pregunta">
+                El metro de Londres es el más antiguo del mundo.
+                </div>
+                <div class="respuesta" data-valor="true">
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <span id="nombre">jhb3 | Práctica 1 de Desarrollo de Aplicaciones en Internet | Universitat d'Alacant |</span>
+        <a href="#" onclick="changeCSS('./css/normal.css');">Vista normal</a> |
+        <a href="#" onclick="changeCSS('./css/compact.css');">Vista compacta</a>
+        <span id="tiempo">[5 horas]</span>
+    </footer>
+</body>
+</html>

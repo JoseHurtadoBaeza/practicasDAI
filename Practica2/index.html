@@ -16,9 +16,18 @@
         }
     </script>    
 
+    <!-- Insertamos el tipo de letra Ubuntu para la vista compacta-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+
+    <!-- Insertamos el tipo de letra Droid Serif para la vista normal-->
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'>
 
-    <link id="estilo" rel="stylesheet" type="text/css" href="./css/comun.css">
+    <link id="estilo" rel="stylesheet" type="text/css" href="./css/normal.css">
+
+    <link id="estandar" rel="stylesheet" type="text/css" href="./css/comun.css">
+
 
 </head>
 <body>
@@ -26,13 +35,14 @@
     <header>
 
         <h1>qÜestiona</h1>
-        <p>qÜestiona es una aplicación web que permite gestionar cuestionarios sobre un determinado tema en el que las posibles respuestas son</p>
-        <p>verdadero o falso. La aplicación se desarrolla como parte de las prácticas de la asignatura Desarrollo de Aplicaciones en Internet del Grado</p>
-        <p>en Ingeniería Informática de la Universitat d'Alacant.</p>
+        <p>qÜestiona es una aplicación web que permite gestionar cuestionarios sobre un determinado tema en el que las posibles respuestas son
+        verdadero o falso. La aplicación se desarrolla como parte de las prácticas de la asignatura Desarrollo de Aplicaciones en Internet del Grado
+        en Ingeniería Informática de la Universitat d'Alacant.</p>
 
         <nav>
             <ul>
-                
+                <li><a href=#paris>París</a></li>
+                <li><a href=#londres>Londres</a></li>
             </ul>
         </nav>
 
@@ -65,7 +75,7 @@
 
             <div class="bloque">
                 <div class="pregunta">
-                París se divide administrativamente en 20 distritos o <span>arrondissements.</span>
+                París se divide administrativamente en 20 distritos o <span class="idioma">arrondissements.</span>
                 </div>
                 <div class="respuesta" data-valor="true">
                 </div>
@@ -102,10 +112,10 @@
     </main>
 
     <footer>
-        <span id="nombre">jhb3 | Práctica 1 de Desarrollo de Aplicaciones en Internet | Universitat d'Alacant |</span>
+        <span id="nombre">jhb3 | Práctica 1 de Desarollo de Aplicaciones en Internet | Universitat d'Alacant |</span>
         <a href="#" onclick="changeCSS('./css/normal.css');">Vista normal</a> |
         <a href="#" onclick="changeCSS('./css/compact.css');">Vista compacta</a>
-        <span id="tiempo">[5 horas]</span>
+        <span id="tiempo">[8 horas]</span>
     </footer>
 </body>
 </html>

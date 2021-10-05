@@ -1,6 +1,5 @@
 body {
-    font-family: 'Droid-Serif', serif;
-    counter-reset: section;
+    font-family: 'Droid Serif', serif;
 }
 
 .bloque {
@@ -12,7 +11,11 @@ body {
     box-shadow: 6px 6px 3px slategray;
 }
 
-.pregunta {
+main section {
+    counter-reset: section;
+}
+
+section .bloque:before {
     counter-increment: section;
     content: "Pregunta " counter(section);
 }

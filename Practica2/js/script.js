@@ -5,25 +5,32 @@ function addCruz(nodo) {
 }
 
 // FUNCIONES AUXILIARES
+
+/* Inserta el nodo nuevoHijo como último hijo del nodo padre */
 function insertAsLastChild(padre, nuevoHijo){
 
+    padre.append(nuevoHijo);
+
 }
 
+/* Inserta el nodo nuevoHIjo como primer hijo del nodo padre */
 function insertAsFirstChild(padre, nuevoHijo){
 
-
+    padre.prepend(nuevoHijo);
 
 }
 
+/* Inserta  el nodo nuevoHijo como hijo del nodo padre inmediatamente antes del nodo hijo */
 function insertBeforeChild(padre, hijo, nuevoHijo){
 
-
+    padre.insertBefore(nuevoHijo, hijo);
 
 }
 
+/* Elimina del DOM el nodo pasado como parámetro */
 function removeElement(nodo){
 
-
+    nodo.remove();
 
 }
 

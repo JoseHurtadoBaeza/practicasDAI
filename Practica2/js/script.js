@@ -39,6 +39,9 @@ function removeElement(nodo){
 
 }
 
+/* Accede a un ancestro para el que conocemos un selector, pero no conocemos
+la distancia exacta a la que se encuentra o no nos interesa que nuestro código 
+dependa en exceso de dicha distancia */
 function queryAncestorSelector(node, selector){
 
     var parent= node.parentNode;
@@ -53,3 +56,24 @@ function queryAncestorSelector(node, selector){
     return (found)?parent:null;
 
 }
+
+/* Función que nos permite borrar preguntas de los cuestionarios */
+function borraPregunta(event) {
+
+    let pregunta = queryAncestorSelector(event.target, ".bloque"); // Referencia a la pregunta
+    
+    let cuestionario = queryAncestorSelector(pregunta, "section"); // Referencia al cuestionario
+
+    let enlace = queryAncestorSelector(pregunta , "header nav a#" + cuestionario.getAttribute("id")); // Referencia al enlace que dirige al cuestionario
+
+    removeElement(pregunta); // Borramos la pregunta
+
+    // Si no quedan preguntas en el cuestionario lo borramos así como su enlace
+    if(cuestionario.querySelector(".bloque") == null){
+        
+        removeElement(cuestionario);
+        removeElement(enlace);
+
+    }
+
+}  

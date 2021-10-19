@@ -74,12 +74,20 @@ main{
 }
 
 .bloque {
+    position: relative;
     background-color: whitesmoke;
     border: 1px solid lightgray;
     margin-top: 10px;
     margin-bottom: 20px;
     padding: 10px;
     box-shadow: 6px 6px 3px slategray;
+}
+
+.borra {
+    position: absolute;
+    right: 2px;
+    top:  1px;
+    cursor: pointer;
 }
 
 main section {

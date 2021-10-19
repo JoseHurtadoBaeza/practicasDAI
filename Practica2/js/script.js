@@ -1,7 +1,12 @@
+/* Añade un icono para borrar cada pregunta de los cuestionarios */
 function addCruz(nodo) {
-    let div = document.createElement("div");
-    div.className="borra";
-    insertAsFirstChild(div, nodo);
+
+    let cruz = document.createElement("div");
+    cruz.className = "borra";
+    cruz.innerHTML = "&#9746";
+    insertAsFirstChild(nodo, cruz);
+    nodo.addEventListener("click", borraPregunta, false); // TODO: Comprobar que si hay que poner false o true
+
 }
 
 // FUNCIONES AUXILIARES

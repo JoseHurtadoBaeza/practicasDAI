@@ -5,7 +5,7 @@ function addCruz(nodo) {
     cruz.className = "borra";
     cruz.innerHTML = "&#9746";
     insertAsFirstChild(nodo, cruz);
-    nodo.addEventListener("click", borraPregunta, false); // TODO: Comprobar que si hay que poner false o true
+    cruz.addEventListener("click", borraPregunta, false);
 
 }
 
@@ -60,19 +60,37 @@ function queryAncestorSelector(node, selector){
 /* Función que nos permite borrar preguntas de los cuestionarios */
 function borraPregunta(event) {
 
-    let pregunta = queryAncestorSelector(event.target, ".bloque"); // Referencia a la pregunta
+    let bloquePregunta = queryAncestorSelector(event.target, ".bloque"); // Referencia a la pregunta
     
-    let cuestionario = queryAncestorSelector(pregunta, "section"); // Referencia al cuestionario
+    let cuestionario = queryAncestorSelector(bloquePregunta, "section"); // Referencia al cuestionario
 
-    let enlace = queryAncestorSelector(pregunta , "header nav a#" + cuestionario.getAttribute("id")); // Referencia al enlace que dirige al cuestionario
-
-    removeElement(pregunta); // Borramos la pregunta
+    removeElement(bloquePregunta); // Borramos el bloque con la pregunta
 
     // Si no quedan preguntas en el cuestionario lo borramos así como su enlace
     if(cuestionario.querySelector(".bloque") == null){
         
-        removeElement(cuestionario);
-        removeElement(enlace);
+        // Nos guardamos todos los enlaces actuales
+        let links = document.querySelectorAll("header nav ul a");
+
+        // Nos guardamos el selector para la comparación
+        let href = "#" + cuestionario.getAttribute("id");
+
+        let encontrado = false;
+
+        // Buscamos el enlace que case con el href
+        for (let i = 0; i < links.length && !encontrado; i++){
+
+            if(links[i].getAttribute("href") == href){
+
+                removeElement(queryAncestorSelector(links[i], "li")); // Borramos el elemento li de la lista que contiene el enlace
+                encontrado = true;
+
+            }
+
+        }
+
+        removeElement(cuestionario); // Elmininamos el cuestionario
+        
 
     }
 

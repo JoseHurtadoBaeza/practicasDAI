@@ -1,4 +1,6 @@
 /* Añade un icono para borrar cada pregunta de los cuestionarios */
+'use strict';
+
 function addCruz(nodo) {
 
     let cruz = document.createElement("div");
@@ -95,6 +97,37 @@ function borraPregunta(event) {
     }
 
 } 
+
+function addFormPregunta(nodoSection) {
+
+    // Nos guardamos el prefijo a añadir en los name
+    let prefijo = nodoSection.id + "_";
+
+    // Creamos el div que va a representar el formulario de inserción de preguntas
+    let form = document.createElement("div");
+    form.className = "formulario";
+
+    // Creamos la lista desordenada y sus 3 elementos
+    let lista = document.createElement("ul");
+    let enunciado = document.createElement("li");
+    let respuesta = document.createElement("li");
+    let nuevaPregunta = document.createElement("li");
+
+    // Preparamos el elemento enunciado
+    let labelEnunciado = document.createElement("label");
+    labelEnunciado.textContent = "Enunciado de la pregunta:";
+    let inputEnunciado = document.createElement("input");
+    inputEnunciado.type = "text";
+    inputEnunciado.name = prefijo + "respuesta";
+
+    // Preparamos el elemento respuesta
+    let labelRespuesta = document.createElement("label");
+    labelRespuesta.textContent = "Respuesta:";
+    let input1Respuesta = document.createElement("")
+
+    addEventListener(boton, addPregunta, false); // Manejador evento de clic sobre el botón
+
+}
 
 function init() {
 

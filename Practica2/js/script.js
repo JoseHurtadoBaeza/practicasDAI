@@ -94,4 +94,17 @@ function borraPregunta(event) {
 
     }
 
-}  
+} 
+
+function init() {
+
+    let preguntas = document.querySelectorAll(".bloque"); // Nos guardamos todos las preguntas
+
+    // Añadimos la cruz a cada una de las preguntas de los cuestionarios
+    for(let i = 0; i < preguntas.length; i++) {
+        addCruz(preguntas[i]);
+    }
+
+}   
+
+window.addEventListener('DOMContentLoaded', init);

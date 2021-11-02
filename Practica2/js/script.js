@@ -27,7 +27,7 @@ function insertAsFirstChild(padre, nuevoHijo){
 
 }
 
-/* Inserta  el nodo nuevoHijo como hijo del nodo padre inmediatamente antes del nodo hijo */
+/* Inserta el nodo nuevoHijo como hijo del nodo padre inmediatamente antes del nodo hijo */
 function insertBeforeChild(padre, hijo, nuevoHijo){
 
     padre.insertBefore(nuevoHijo, hijo);
@@ -104,27 +104,63 @@ function addFormPregunta(nodoSection) {
     let prefijo = nodoSection.id + "_";
 
     // Creamos el div que va a representar el formulario de inserción de preguntas
-    let form = document.createElement("div");
-    form.className = "formulario";
+    let formulario = document.createElement("div");
+    formulario.className = "formulario";
 
     // Creamos la lista desordenada y sus 3 elementos
     let lista = document.createElement("ul");
+    insertAsLastChild(formulario, lista);
     let enunciado = document.createElement("li");
+    insertAsLastChild(lista, enunciado);
     let respuesta = document.createElement("li");
+    insertAsLastChild(lista, respuesta);
     let nuevaPregunta = document.createElement("li");
+    insertAsLastChild(lista, nuevaPregunta);
 
     // Preparamos el elemento enunciado
     let labelEnunciado = document.createElement("label");
     labelEnunciado.textContent = "Enunciado de la pregunta:";
+    insertAsLastChild(enunciado, labelEnunciado);
     let inputEnunciado = document.createElement("input");
     inputEnunciado.type = "text";
     inputEnunciado.name = prefijo + "respuesta";
+    insertAsLastChild(enunciado, inputEnunciado);
 
     // Preparamos el elemento respuesta
     let labelRespuesta = document.createElement("label");
     labelRespuesta.textContent = "Respuesta:";
-    let input1Respuesta = document.createElement("")
+    insertAsLastChild(respuesta, labelRespuesta);
 
+    let input1Respuesta = document.createElement("input");
+    input1Respuesta.type = "radio";
+    input1Respuesta.name = prefijo + "respuesta";
+    input1Respuesta.value = "verdadero";
+    input1Respuesta.checked = true;
+    let texto1Respuesta = document.createTextNode("Verdadero");
+    insertAsLastChild(respuesta, input1Respuesta);
+    insertAsLastChild(respuesta, texto1Respuesta);
+
+    let input2Respuesta = document.createElement("input");
+    input2Respuesta.type = "radio";
+    input2Respuesta.name = prefijo + "respuesta";
+    input2Respuesta.value = "falso";
+    let texto2Respuesta = document.createTextNode("Falso");
+    insertAsLastChild(respuesta, input2Respuesta);
+    insertAsLastChild(respuesta, texto2Respuesta);
+
+    // Preparamos el elemento nuevaPregunta
+    let boton = document.createElement("input");
+    boton.type = "button";
+    boton.value = "Añadir nueva pregunta";
+    insertAsLastChild(nuevaPregunta, boton);
+
+    // Nos guardamos una referencia a la primera pregunta si la hubiera
+    let bloque = nodoSection.querySelector(".bloque");
+
+    // Añadimos el formulario generado al cuestionario antes de la primera pregunta
+    insertBeforeChild(nodoSection, bloque, formulario);
+
+    // Manejador para el evento de clic sobre el botón
     addEventListener(boton, addPregunta, false); // Manejador evento de clic sobre el botón
 
 }

@@ -165,6 +165,13 @@ function addFormPregunta(nodoSection) {
 
 }
 
+/*  */
+function addPregunta(event){
+
+    
+
+}
+
 function init() {
 
     let preguntas = document.querySelectorAll(".bloque"); // Nos guardamos todos las preguntas

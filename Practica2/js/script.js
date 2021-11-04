@@ -161,6 +161,13 @@ function addFormPregunta(nodoSection) {
     // Añadimos el formulario generado al cuestionario antes de la primera pregunta
     insertBeforeChild(nodoSection, bloque, formulario);
 
+    // Manejador para cuando se pulsa la tecla Enter sobre el campo 
+    enunciado.addEventListener("keydown", function(KeyboardEvent){
+        if(KeyboardEvent.key === 'Enter'){
+            addPregunta(KeyboardEvent);
+        }
+    });
+
     // Manejador para el evento de clic sobre el botón
     boton.addEventListener("click", addPregunta, false); // Manejador evento de clic sobre el botón
 
@@ -188,7 +195,7 @@ function addPregunta(event){
 
         let pregunta = document.createElement("div");
         pregunta.className = "pregunta";
-        pregunta.textContent = enunciado;
+        pregunta.textContent = enunciado.value;
         insertAsLastChild(nuevoBloque, pregunta);
 
         let respuesta = document.createElement("div");
@@ -235,9 +242,12 @@ function addCuestionario(event) {
 
         // Creamos y añadimos el título al cuestionario
         let titulo = document.createElement("h2");
-        titulo.src = url.value;
-        titulo.alt = "Una imagen representativa de " + tema.value;
-        titulo.textContent = "Cuestionario sobre " + tema.value;
+        let imagen = document.createElement("img");
+        imagen.src = url.value;
+        imagen.alt = "Una imagen representativa de " + tema.value;
+        insertAsLastChild(titulo, imagen);
+        let nodoTexto = document.createTextNode("Cuestionario sobre " + tema.value);
+        insertAsLastChild(titulo, nodoTexto);
         insertAsLastChild(cuestionario, titulo);
         
         // Le añadimos el id
@@ -287,9 +297,26 @@ function init() {
     for(let i = 0; i < cuestionarios.length; i++){
         addFormPregunta(cuestionarios[i]);
     } 
+    // Nos guardamos las referencias de cada campo del formulario de creación de cuestionarios
+    let tema = document.querySelector("#nuevoCuestionario input[name='tema']");
+    let url = document.querySelector("#nuevoCuestionario input[name='imagen']");
+    let botonNuevoFormulario = document.querySelector("#nuevoCuestionario input[value='Crear nuevo cuestionario']");
 
-    let botonNuevoFormulario = document.querySelector("input[value='Crear nuevo cuestionario']");
+    // Manejador de evento para cuando se pulsa la tecla Enter sobre el cuadro de texto de Tema del cuestionario
+    tema.addEventListener("keydown", function(KeyboardEvent){
+        if(KeyboardEvent.key === 'Enter'){
+            addCuestionario(KeyboardEvent);
+        }
+    });
 
+    // Manejador de evento para cuando se pulsa la tecla Enter sobre el cuadro de texto de URL de la imagen
+    url.addEventListener("keydown", function(KeyboardEvent){
+        if(KeyboardEvent.key === 'Enter'){
+            addCuestionario(KeyboardEvent);
+        }
+    });
+
+    // Manejador de evento para cuando se haga click en el botón de creación de nuevo cuestionario
     botonNuevoFormulario.addEventListener("click", addCuestionario,false);
 
 }   

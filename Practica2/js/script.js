@@ -98,6 +98,7 @@ function borraPregunta(event) {
 
 } 
 
+/* Función que añade un formulario para añadir preguntas a un cuestionario */
 function addFormPregunta(nodoSection) {
 
     // Nos guardamos el prefijo a añadir en los name
@@ -161,11 +162,11 @@ function addFormPregunta(nodoSection) {
     insertBeforeChild(nodoSection, bloque, formulario);
 
     // Manejador para el evento de clic sobre el botón
-    addEventListener(boton, addPregunta, false); // Manejador evento de clic sobre el botón
+    boton.addEventListener("click", addPregunta, false); // Manejador evento de clic sobre el botón
 
 }
 
-/*  */
+/* Función que añade preguntas a un cuestionario */
 function addPregunta(event){
 
     // Comprobamos que ninguno de los campos del formulario haya quedado sin rellenar
@@ -177,13 +178,35 @@ function addPregunta(event){
 
     // Si el campo enunciado o los dos campos de respuesta están vacíos
     if ((enunciado.value == null) || (!respuestaVerdadero.checked && !respuestaFalso.checked)){  
-        window.alert("Ambos campos respuesta están vacíos.");
+        window.alert("Error al añadir la pregunta: Todos los campos deben ser rellenados.");
     }
     else {
         
-        let nuevaPregunta = document.createElement("div");
-        nuevaPregunta.className = "bloque";
-        addCruz(nuevaPregunta); // Añadimos el icono de borrado
+        // Generamos el HTML correspondiente a una bloque de pregunta
+        let nuevoBloque = document.createElement("div");
+        nuevoBloque.className = "bloque";
+
+        let pregunta = document.createElement("div");
+        pregunta.className = "pregunta";
+        pregunta.textContent = enunciado;
+        insertAsLastChild(nuevoBloque, pregunta);
+
+        let respuesta = document.createElement("div");
+        respuesta.className = "respuesta";
+        
+        if(respuestaVerdadero.checked){
+            respuesta.setAttribute("data-valor", "true");
+        }
+        else{
+            respuesta.setAttribute("data-valor", "false");
+        }
+
+        insertAsLastChild(nuevoBloque, respuesta);
+
+        addCruz(nuevoBloque); // Añadimos el icono de borrado
+        
+        let cuestionario = queryAncestorSelector(event.target, "section"); // Nos guardamos una referencia al cuestionario actual
+        insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la nueva pregunta a dicho cuestionario
 
     }
 
@@ -193,6 +216,61 @@ function addPregunta(event){
     respuestaFalso.checked = false;
 
 }
+
+/* Función que añade un nuevo cuestionario */ 
+function addCuestionario(event) {
+
+    let formulario = queryAncestorSelector(event.target, "div#nuevoCuestionario"); // Nos guaradamos una referencia al div que contiene el formulario
+
+    // Validamos que ninguno de los campos del formulario haya quedado sin rellenar
+    let tema = formulario.querySelector("input[name='tema']");
+    let url = formulario.querySelector("input[name='imagen']");
+
+    if(tema.value == null || url.value == null) {
+        window.alert("Error al añadir el cuestionario: Todos los campos deben ser rellenados.");
+    }
+    else {
+
+        let cuestionario = document.createElement("section");
+
+        // Creamos y añadimos el título al cuestionario
+        let titulo = document.createElement("h2");
+        titulo.src = url;
+        titulo.alt = "Una imagen representativa de " + tema;
+        titulo.textContent = "Cuestionario sobre " + tema;
+        cuestionario.insertAsLastChild(titulo);
+        
+        // Le añadimos el id
+        cuestionario.id = "c" + numCuestionarios;
+
+        // Creamos una nueva entrada en el índice
+        let elementoLista = document.createElement("li");
+        let enlace = document.createElement("a");
+        enlace.href = "#" + cuestionario.id;
+        enlace.textContent = tema;
+        insertAsLastChild(elementoLista, enlace);
+
+        // Obtenemos una referencia a la lista no ordenada del elemento nav
+        let listaUl = document.querySelector("header nav ul");
+        insertAsLastChild(listaUl, elementoLista);
+        
+        // Añadimos el cuestionario como último hijo del main
+        let bloqueMain = document.querySelector("main");
+        insertAsLastChild(bloqueMain, cuestionario);
+
+        addFormPregunta(cuestionario); // Añadimos el formulario de adición de preguntas al cuestionario
+
+        numCuestionarios++;
+
+        // Reseteamos los campos del formulario de adición de cuestionarios
+        tema.value = "";
+        url.value = "";
+
+    }
+
+}
+
+var numCuestionarios = 1; // Variable global para identificar a los nuevos cuestionarios
 
 function init() {
 
@@ -209,6 +287,10 @@ function init() {
     for(let i = 0; i < cuestionarios.length; i++){
         addFormPregunta(cuestionarios[i]);
     } 
+
+    let botonNuevoFormulario = document.querySelector("input[value='Crear nuevo cuestionario']");
+
+    botonNuevoFormulario.addEventListener("click", addCuestionario,false);
 
 }   
 

@@ -168,7 +168,29 @@ function addFormPregunta(nodoSection) {
 /*  */
 function addPregunta(event){
 
-    
+    // Comprobamos que ninguno de los campos del formulario haya quedado sin rellenar
+    let formulario = queryAncestorSelector(event.target, "div.formulario");
+
+    let enunciado = formulario.querySelector("input[type='text']");
+    let respuestaVerdadero = formulario.querySelector("input[value='verdadero']");
+    let respuestaFalso = formulario.querySelector("input[value='falso']");
+
+    // Si el campo enunciado o los dos campos de respuesta están vacíos
+    if ((enunciado.value == null) || (!respuestaVerdadero.checked && !respuestaFalso.checked)){  
+        window.alert("Ambos campos respuesta están vacíos.");
+    }
+    else {
+        
+        let nuevaPregunta = document.createElement("div");
+        nuevaPregunta.className = "bloque";
+        addCruz(nuevaPregunta); // Añadimos el icono de borrado
+
+    }
+
+    // Reiniciamos los campos del formulario
+    enunciado.value = "";
+    respuestaVerdadero.checked = true;
+    respuestaFalso.checked = false;
 
 }
 

@@ -183,8 +183,8 @@ function addPregunta(event){
     let respuestaVerdadero = formulario.querySelector("input[value='verdadero']");
     let respuestaFalso = formulario.querySelector("input[value='falso']");
 
-    // Si el campo enunciado o los dos campos de respuesta están vacíos
-    if ((enunciado.value == null) || (!respuestaVerdadero.checked && !respuestaFalso.checked)){  
+    // Si el campo enunciado está vacío
+    if (enunciado.value.length == 0){ 
         window.alert("Error al añadir la pregunta: Todos los campos deben ser rellenados.");
     }
     else {
@@ -233,7 +233,7 @@ function addCuestionario(event) {
     let tema = formulario.querySelector("input[name='tema']");
     let url = formulario.querySelector("input[name='imagen']");
 
-    if(tema.value == null || url.value == null) {
+    if(tema.value.length == 0 || url.value.length == 0) {
         window.alert("Error al añadir el cuestionario: Todos los campos deben ser rellenados.");
     }
     else {

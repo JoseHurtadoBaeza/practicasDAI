@@ -211,7 +211,7 @@ function addPregunta(event){
     }
 
     // Reiniciamos los campos del formulario
-    enunciado.value = "";
+    enunciado.value = null;
     respuestaVerdadero.checked = true;
     respuestaFalso.checked = false;
 
@@ -235,10 +235,10 @@ function addCuestionario(event) {
 
         // Creamos y añadimos el título al cuestionario
         let titulo = document.createElement("h2");
-        titulo.src = url;
-        titulo.alt = "Una imagen representativa de " + tema;
-        titulo.textContent = "Cuestionario sobre " + tema;
-        cuestionario.insertAsLastChild(titulo);
+        titulo.src = url.value;
+        titulo.alt = "Una imagen representativa de " + tema.value;
+        titulo.textContent = "Cuestionario sobre " + tema.value;
+        insertAsLastChild(cuestionario, titulo);
         
         // Le añadimos el id
         cuestionario.id = "c" + numCuestionarios;
@@ -247,7 +247,7 @@ function addCuestionario(event) {
         let elementoLista = document.createElement("li");
         let enlace = document.createElement("a");
         enlace.href = "#" + cuestionario.id;
-        enlace.textContent = tema;
+        enlace.textContent = tema.value;
         insertAsLastChild(elementoLista, enlace);
 
         // Obtenemos una referencia a la lista no ordenada del elemento nav
@@ -263,8 +263,8 @@ function addCuestionario(event) {
         numCuestionarios++;
 
         // Reseteamos los campos del formulario de adición de cuestionarios
-        tema.value = "";
-        url.value = "";
+        tema.value = null;
+        url.value = null;
 
     }
 

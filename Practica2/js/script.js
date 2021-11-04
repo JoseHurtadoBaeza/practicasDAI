@@ -136,7 +136,7 @@ function addFormPregunta(nodoSection) {
     input1Respuesta.type = "radio";
     input1Respuesta.name = prefijo + "respuesta";
     input1Respuesta.value = "verdadero";
-    input1Respuesta.checked = true;
+    input1Respuesta.setAttribute("checked", "");
     let texto1Respuesta = document.createTextNode("Verdadero");
     insertAsLastChild(respuesta, input1Respuesta);
     insertAsLastChild(respuesta, texto1Respuesta);
@@ -158,8 +158,14 @@ function addFormPregunta(nodoSection) {
     // Nos guardamos una referencia a la primera pregunta si la hubiera
     let bloque = nodoSection.querySelector(".bloque");
 
-    // Añadimos el formulario generado al cuestionario antes de la primera pregunta
-    insertBeforeChild(nodoSection, bloque, formulario);
+    // Añadimos el formulario generado al cuestionario antes de la primera pregunta si existiese
+    if(bloque !== null) {
+        insertBeforeChild(nodoSection, bloque, formulario);
+    }
+    else {
+        insertAsLastChild(nodoSection, formulario);
+    }
+
 
     // Manejador para cuando se pulsa la tecla Enter sobre el campo 
     enunciado.addEventListener("keydown", function(KeyboardEvent){
@@ -195,7 +201,7 @@ function addPregunta(event){
 
         let pregunta = document.createElement("div");
         pregunta.className = "pregunta";
-        pregunta.textContent = enunciado.value;
+        pregunta.innerHTML = enunciado.value;
         insertAsLastChild(nuevoBloque, pregunta);
 
         let respuesta = document.createElement("div");

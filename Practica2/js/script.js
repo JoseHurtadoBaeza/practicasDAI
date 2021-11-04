@@ -203,6 +203,13 @@ function init() {
         addCruz(preguntas[i]);
     }
 
+    let cuestionarios = document.querySelectorAll("section"); // Nos guardamos todos los cuestionarios
+    
+    // Añadimos el formulario de adición de preguntas a todos los cuestionarios
+    for(let i = 0; i < cuestionarios.length; i++){
+        addFormPregunta(cuestionarios[i]);
+    } 
+
 }   
 
 window.addEventListener('DOMContentLoaded', init);

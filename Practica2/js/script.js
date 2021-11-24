@@ -181,6 +181,31 @@ function addFormPregunta(nodoSection) {
 
 }
 
+/* Función que elimina  */
+function procesaExtract(r) {
+
+    var promesa = new Promise(function(resolve, reject) {
+
+        if(r.length > 0) {
+            
+            for(var i=0; i<r.length; i++) {
+                r[i]
+            }
+
+            resolve(r);
+
+        }
+        else {
+            reject(Error("String cannot be empty"));
+        }
+
+    });
+
+    return promesa;
+
+}
+
+/* Función que añade  */
 function addWikipedia(terminoBuscar, nodoFormulario){
 
     var resultado = document.createTextNode;
@@ -194,9 +219,7 @@ function addWikipedia(terminoBuscar, nodoFormulario){
         }
         return response.json();
     })
-    .then(function() {
-
-    })
+    .then(procesaExtract)
 
     .catch(function(error) {
         console.log('Ha habido un problema: \n', error);

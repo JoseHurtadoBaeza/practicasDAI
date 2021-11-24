@@ -181,6 +181,28 @@ function addFormPregunta(nodoSection) {
 
 }
 
+function addWikipedia(terminoBuscar, nodoFormulario){
+
+    var resultado = document.createTextNode;
+    resultado.textContent = "";
+
+
+    fetch('https://es.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=extracts&exintro&explaintext&continue&titles=' + terminoBuscar)
+    .then(function(response) {
+        if(!response.ok){
+            throw Error(response.statusText);
+        }
+        return response.json();
+    })
+    .then(function() {
+
+    })
+
+    .catch(function(error) {
+        console.log('Ha habido un problema: \n', error);
+    })
+}
+
 /* Función que añade preguntas a un cuestionario */
 function addPregunta(event){
 

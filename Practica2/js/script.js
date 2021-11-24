@@ -177,6 +177,8 @@ function addFormPregunta(nodoSection) {
     // Manejador para el evento de clic sobre el botón
     boton.addEventListener("click", addPregunta, false); // Manejador evento de clic sobre el botón
 
+    return formulario;
+
 }
 
 /* Función que añade preguntas a un cuestionario */

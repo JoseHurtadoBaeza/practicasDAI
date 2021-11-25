@@ -63,12 +63,14 @@ function queryAncestorSelector(node, selector){
 function borraPregunta(event) {
 
     let bloquePregunta = queryAncestorSelector(event.target, ".bloque"); // Referencia a la pregunta
-    
+
     let cuestionario = queryAncestorSelector(bloquePregunta, "section"); // Referencia al cuestionario
+
+    let descripcion = querySelector(cuestionario, "div.wiki"); // Rereferencia al texto descriptivo del cuestionario
 
     removeElement(bloquePregunta); // Borramos el bloque con la pregunta
 
-    // Si no quedan preguntas en el cuestionario lo borramos así como su enlace
+    // Si no quedan preguntas en el cuestionario lo borramos así como su enlace y la descripción
     if(cuestionario.querySelector(".bloque") == null){
         
         // Nos guardamos todos los enlaces actuales
@@ -91,6 +93,7 @@ function borraPregunta(event) {
 
         }
 
+        removeElement(descripcion); // Borramos el texto descriptivo asociado
         removeElement(cuestionario); // Elmininamos el cuestionario
         
 
@@ -181,12 +184,12 @@ function addFormPregunta(nodoSection) {
 
 }
 
-/* Función que añade información de wikipedia sobre el tema del cuestionario */
+/* Función que añade una descripción de wikipedia sobre el tema de cada cuestionario */
 function addWikipedia(terminoBuscar, nodoFormulario){
 
-    var resultado = document.createElement("div");
-    resultado.className = "wiki";
-    resultado.textContent = "";
+    var descripcion = document.createElement("div");
+    descripcion.className = "wiki";
+    descripcion.textContent = "";
 
     fetch('https://es.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=extracts&exintro&explaintext&continue&titles=' + terminoBuscar)
     .then(function(response) { // Obtenemos la respuesta
@@ -218,15 +221,17 @@ function addWikipedia(terminoBuscar, nodoFormulario){
 
     })
     .then(function(responseAsObject){
-        resultado.textContent += responseAsObject.extract;
+        descripcion.textContent += responseAsObject.extract;
     })
 
     .catch(function(error) {
         console.log('Ha habido un problema: \n', error);
     })
 
+    let padre = queryAncestorSelector(nodoFormulario, "section");
+
     // Intertamos el nodo con la descripción de wikipedia antes del formulario cuyo nodo se ha pasado como parámetro
-    insertBefore();
+    insertBeforeChild(padre, nodoFormulario, descripcion);
 
 }
 

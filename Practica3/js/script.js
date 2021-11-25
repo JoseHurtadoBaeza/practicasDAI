@@ -189,27 +189,27 @@ function addWikipedia(terminoBuscar, nodoFormulario){
     resultado.textContent = "";
 
     fetch('https://es.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=extracts&exintro&explaintext&continue&titles=' + terminoBuscar)
-    .then(function(response) {
+    .then(function(response) { // Obtenemos la respuesta
         if(!response.ok){
             throw Error(response.statusText);
         }
         return response.json(); // Llama a JSON.parse()
-    })
-    .then(function(r){
+    }) 
+    .then(function(description){ // Procesamos la respuesta para eliminar los [num]
         
         var promesa = new Promise(function(resolve, reject) {
 
             if(r.length > 0){
 
-                for(var i=0; i<r.length; i++){
-                    r[i]
-                }
+                var regex = /[\d]/g;
+                var replacement = "";
+                description.replace(regex, replacement);
 
-                resolve(r);
+                resolve(description);
 
             }
             else {
-                reject(Error("La cadena no puede estar vacía"))
+                reject(Error("La cadena no puede estar vacía"));
             }
 
         });
@@ -217,13 +217,16 @@ function addWikipedia(terminoBuscar, nodoFormulario){
         return promesa;
 
     })
+    .then(function(responseAsObject){
+        resultado.textContent += responseAsObject.extract;
+    })
 
     .catch(function(error) {
         console.log('Ha habido un problema: \n', error);
     })
 
     // Intertamos el nodo con la descripción de wikipedia antes del formulario cuyo nodo se ha pasado como parámetro
-    
+    insertBefore();
 
 }
 

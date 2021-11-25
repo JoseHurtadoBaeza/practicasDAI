@@ -73,6 +73,10 @@ main{
     border-radius: 2px;
 }
 
+.wiki {
+    font-size: 90%
+}
+
 .bloque {
     position: relative;
     background-color: whitesmoke;

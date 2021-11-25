@@ -177,6 +177,54 @@ function addFormPregunta(nodoSection) {
     // Manejador para el evento de clic sobre el botón
     boton.addEventListener("click", addPregunta, false); // Manejador evento de clic sobre el botón
 
+    return formulario;
+
+}
+
+/* Función que añade información de wikipedia sobre el tema del cuestionario */
+function addWikipedia(terminoBuscar, nodoFormulario){
+
+    var resultado = document.createElement("div");
+    resultado.className = "wiki";
+    resultado.textContent = "";
+
+    fetch('https://es.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=extracts&exintro&explaintext&continue&titles=' + terminoBuscar)
+    .then(function(response) {
+        if(!response.ok){
+            throw Error(response.statusText);
+        }
+        return response.json(); // Llama a JSON.parse()
+    })
+    .then(function(r){
+        
+        var promesa = new Promise(function(resolve, reject) {
+
+            if(r.length > 0){
+
+                for(var i=0; i<r.length; i++){
+                    r[i]
+                }
+
+                resolve(r);
+
+            }
+            else {
+                reject(Error("La cadena no puede estar vacía"))
+            }
+
+        });
+
+        return promesa;
+
+    })
+
+    .catch(function(error) {
+        console.log('Ha habido un problema: \n', error);
+    })
+
+    // Intertamos el nodo con la descripción de wikipedia antes del formulario cuyo nodo se ha pasado como parámetro
+    
+
 }
 
 /* Función que añade preguntas a un cuestionario */

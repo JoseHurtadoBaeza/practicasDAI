@@ -221,6 +221,13 @@ function addWikipedia(terminoBuscar, nodoFormulario){
 
 }
 
+/* Función que añade una imagen de flickr a un cuestionario */
+function addFlickr(terminoBuscar, nodoImagenCuestionario){
+
+    
+
+}
+
 /* Función que añade preguntas a un cuestionario */
 function addPregunta(event){
 

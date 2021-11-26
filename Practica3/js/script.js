@@ -224,8 +224,16 @@ function addWikipedia(terminoBuscar, nodoFormulario){
 /* Función que añade una imagen de flickr a un cuestionario */
 function addFlickr(terminoBuscar, nodoImagenCuestionario){
 
-    
-
+    fetch('https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=c8550842d585a2ef61a21fe29642258b&text=' + terminoBuscar + '&format=json&per_page=10&media=photos&sort=relevance&nojsoncallback=1')
+    .then(function(response) {
+        if(!response.ok){
+            throw Error(response.statusText);
+        }
+        return response.json(); // Convertimos a un objeto json
+    })
+    .then(function(responseAsObject) {
+        let photoId = responseAsObject.photos.photo[0].id;
+    })
 }
 
 /* Función que añade preguntas a un cuestionario */
@@ -350,6 +358,8 @@ function init() {
     for(let i = 0; i < cuestionarios.length; i++){
         let nodoFormulario = addFormPregunta(cuestionarios[i]);
         addWikipedia(cuestionarios[i].id, nodoFormulario);
+        let nodoImagen = cuestionarios[i].querySelector("h2 img");
+        addFlickr(cuestionarios[i].id, nodoImagen);
     } 
 
     // Nos guardamos las referencias de cada campo del formulario de creación de cuestionarios

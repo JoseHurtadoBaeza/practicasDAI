@@ -199,9 +199,9 @@ function addWikipedia(terminoBuscar, nodoFormulario){
     }) 
     .then(function(responseAsObject){ // Procesamos la respuesta para eliminar los [num]
 
-        let pageId = Object.values(responseAsObject.query.pages)[0].pageid;
+        let pageID = Object.values(responseAsObject.query.pages)[0].pageid;
 
-        let textoSinProcesar = responseAsObject.query.pages[pageId].extract;
+        let textoSinProcesar = responseAsObject.query.pages[pageID].extract;
 
         var regex = /\[\d+]/g;
         var replacement = "";
@@ -229,10 +229,40 @@ function addFlickr(terminoBuscar, nodoImagenCuestionario){
         if(!response.ok){
             throw Error(response.statusText);
         }
-        return response.json(); // Convertimos a un objeto json
+        return response.json(); // Convertimos a un objeto javascript
     })
     .then(function(responseAsObject) {
-        let photoId = responseAsObject.photos.photo[0].id;
+        
+        // Si se encuentra alguna imagen para el término buscado
+        if(responseAsObject.photos.photo.length > 0){
+            
+            let photoId = responseAsObject.photos.photo[0].id; // Nos guardamos el id de la primera foto devuelta por flickr para el término buscado
+
+            fetch('https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=c8550842d585a2ef61a21fe29642258b&photo_id=' + photoId + '&format=json&nojsoncallback=1')
+            .then(function(response){
+                if(!response.ok){
+                    throw Error(response.statusText)
+                }
+                return response.json(); // Convertimos a un objeto javascript
+            })
+            .then(function(responseAsObject){
+    
+                let src = responseAsObject.sizes.size[0].source; // Nos guardamos la referencia a la imagen con el formato más compacto que es la primera
+                nodoImagenCuestionario.src = src;
+    
+            })
+            .catch(function(error) {
+                console.log('Ha habido un problema: \n', error);
+            })
+
+        }
+        else { // Sino
+            nodoImagenCuestionario.src = "./img/globe_east_540.jpg";
+        }
+
+    })
+    .catch(function(error) {
+        console.log('Ha habido un problema: \n', error);
     })
 }
 
@@ -332,9 +362,10 @@ function addCuestionario(event) {
         insertAsLastChild(bloqueMain, cuestionario);
 
         let nodoFormulario = addFormPregunta(cuestionario); // Añadimos el formulario de adición de preguntas al cuestionario
+        let nodoImagen = cuestionario.querySelector("h2 img"); // Nos guardamos una referencia al elemento imagen del cuestionario
 
         addWikipedia(cuestionario.id, nodoFormulario); // Añadimos la descripción de wikipedia al cuestionario
-
+        addFlickr(cuestionario.id, nodoImagen); // Añadimos la foto obtenida de flickr para el cuestionario creado
         // Reseteamos los campos del formulario de adición de cuestionarios
         tema.value = null;
         url.value = null;

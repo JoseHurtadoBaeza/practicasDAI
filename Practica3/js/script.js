@@ -184,46 +184,32 @@ function addFormPregunta(nodoSection) {
 
 }
 
-/* Función que añade una descripción de wikipedia sobre el tema de cada cuestionario */
+/* Función que utiliza el api de wikipedia para añadir un texto descriptivo a cada cuestionario */
 function addWikipedia(terminoBuscar, nodoFormulario){
 
     var descripcion = document.createElement("div");
     descripcion.className = "wiki";
-    descripcion.textContent = "";
 
     fetch('https://es.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=extracts&exintro&explaintext&continue&titles=' + terminoBuscar)
     .then(function(response) { // Obtenemos la respuesta
         if(!response.ok){
             throw Error(response.statusText);
         }
-        return response.json(); // Llama a JSON.parse()
+        return response.json(); // Convertimos el json en un objeto javascript
     }) 
-    .then(function(description){ // Procesamos la respuesta para eliminar los [num]
-        
-        var promesa = new Promise(function(resolve, reject) {
+    .then(function(responseAsObject){ // Procesamos la respuesta para eliminar los [num]
 
-            if(r.length > 0){
+        let pageId = Object.values(responseAsObject.query.pages)[0].pageid;
 
-                var regex = /[\d]/g;
-                var replacement = "";
-                description.replace(regex, replacement);
+        let textoSinProcesar = responseAsObject.query.pages[pageId].extract;
 
-                resolve(description);
+        var regex = /\[\d+]/g;
+        var replacement = "";
+        let textoProcesado = textoSinProcesar.replace(regex, replacement);
 
-            }
-            else {
-                reject(Error("La cadena no puede estar vacía"));
-            }
-
-        });
-
-        return promesa;
+        descripcion.textContent = textoProcesado;
 
     })
-    .then(function(responseAsObject){
-        descripcion.textContent += responseAsObject.extract;
-    })
-
     .catch(function(error) {
         console.log('Ha habido un problema: \n', error);
     })
@@ -313,7 +299,7 @@ function addCuestionario(event) {
         insertAsLastChild(cuestionario, titulo);
         
         // Le añadimos el id
-        cuestionario.id = "c" + numCuestionarios;
+        cuestionario.id = tema.value;
 
         // Creamos una nueva entrada en el índice
         let elementoLista = document.createElement("li");
@@ -330,9 +316,9 @@ function addCuestionario(event) {
         let bloqueMain = document.querySelector("main");
         insertAsLastChild(bloqueMain, cuestionario);
 
-        addFormPregunta(cuestionario); // Añadimos el formulario de adición de preguntas al cuestionario
+        let nodoFormulario = addFormPregunta(cuestionario); // Añadimos el formulario de adición de preguntas al cuestionario
 
-        numCuestionarios++;
+        addWikipedia(cuestionario.id, nodoFormulario); // Añadimos la descripción de wikipedia al cuestionario
 
         // Reseteamos los campos del formulario de adición de cuestionarios
         tema.value = null;
@@ -341,8 +327,6 @@ function addCuestionario(event) {
     }
 
 }
-
-var numCuestionarios = 1; // Variable global para identificar a los nuevos cuestionarios
 
 function init() {
 
@@ -357,8 +341,10 @@ function init() {
     
     // Añadimos el formulario de adición de preguntas a todos los cuestionarios
     for(let i = 0; i < cuestionarios.length; i++){
-        addFormPregunta(cuestionarios[i]);
+        let nodoFormulario = addFormPregunta(cuestionarios[i]);
+        addWikipedia(cuestionarios[i].id, nodoFormulario);
     } 
+
     // Nos guardamos las referencias de cada campo del formulario de creación de cuestionarios
     let tema = document.querySelector("#nuevoCuestionario input[name='tema']");
     let url = document.querySelector("#nuevoCuestionario input[name='imagen']");

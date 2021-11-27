@@ -184,7 +184,7 @@ function addFormPregunta(nodoSection) {
 }
 
 /* Función que utiliza el api de wikipedia para añadir un texto descriptivo a cada cuestionario */
-function addWikipedia(terminoBuscar, nodoFormulario){
+/*function addWikipedia(terminoBuscar, nodoFormulario){
 
     var descripcion = document.createElement("div");
     descripcion.className = "wiki";
@@ -218,10 +218,10 @@ function addWikipedia(terminoBuscar, nodoFormulario){
     // Intertamos el nodo con la descripción de wikipedia antes del formulario cuyo nodo se ha pasado como parámetro
     insertBeforeChild(padre, nodoFormulario, descripcion);
 
-}
+}*/
 
 /* Función que añade una imagen de flickr a un cuestionario */
-function addFlickr(terminoBuscar, nodoImagenCuestionario){
+/*function addFlickr(terminoBuscar, nodoImagenCuestionario){
 
     fetch('https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=c8550842d585a2ef61a21fe29642258b&text=' + terminoBuscar + '&format=json&per_page=10&media=photos&sort=relevance&nojsoncallback=1')
     .then(function(response) {
@@ -263,7 +263,7 @@ function addFlickr(terminoBuscar, nodoImagenCuestionario){
     .catch(function(error) {
         console.log('Ha habido un problema: \n', error);
     })
-}
+}*/
 
 /* Función que añade preguntas a un cuestionario */
 function addPregunta(event){
@@ -331,15 +331,10 @@ function addCuestionario(event) {
 
         let cuestionario = document.createElement("section");
 
-        // Creamos y añadimos el título al cuestionario
-        let titulo = document.createElement("h2");
-        let imagen = document.createElement("img");
-        imagen.alt = "Una imagen representativa de " + tema.value;
-        insertAsLastChild(titulo, imagen);
-        let nodoTexto = document.createTextNode("Cuestionario sobre " + tema.value);
-        insertAsLastChild(titulo, nodoTexto);
-        insertAsLastChild(cuestionario, titulo);
-        
+        let componente = document.createElement("encabezado-cuestionario");
+        componente.setAttribute("data-tema", tema);
+        insertAsLastChild(cuestionario, componente);
+
         // Le añadimos el id
         cuestionario.id = tema.value;
 
@@ -384,10 +379,7 @@ function init() {
     
     // Añadimos el formulario de adición de preguntas a todos los cuestionarios
     for(let i = 0; i < cuestionarios.length; i++){
-        let nodoFormulario = addFormPregunta(cuestionarios[i]);
-        addWikipedia(cuestionarios[i].id, nodoFormulario);
-        let nodoImagen = cuestionarios[i].querySelector("h2 img");
-        addFlickr(cuestionarios[i].id, nodoImagen);
+        addFormPregunta(cuestionarios[i]);
     } 
 
     // Nos guardamos las referencias de cada campo del formulario de creación de cuestionarios

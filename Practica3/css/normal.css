@@ -28,11 +28,6 @@ h1{
     font-weight: bold;
 }
 
-h2{
-    font-size: 25px;
-    font-weight: bold;
-}
-
 main{
     max-width: 1080px;
     margin-right: auto;
@@ -73,10 +68,6 @@ main{
     border-radius: 2px;
 }
 
-.wiki {
-    font-size: 90%
-}
-
 .bloque {
     position: relative;
     background-color: whitesmoke;
@@ -97,14 +88,6 @@ main{
 main section {
     margin-top: 80px;
     counter-reset: section;
-}
-
-main section h2 img {
-    vertical-align: text-top;
-    height: 50px;
-    width: 50px;
-    margin-right: 10px;
-    border: 1px solid lightgray;
 }
 
 section .bloque:before {

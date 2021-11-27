@@ -2,13 +2,16 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Práctica 2 - Una aplicación web local</title>
+    <title>Práctica 3 - Una aplicación con acceso a servicios web de terceros y con componentes web</title>
 
     <!-- Insertamos el tipo de letra Droid Serif para la vista normal-->
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'>
 
     <!-- Hacemos que la vista normal sea la que se muestra por defecto-->
     <link id="estilo" rel="stylesheet" type="text/css" href="./css/normal.css">
+
+    <!-- Adjuntamos el código del componente web creado -->
+    <script defer src="./js/encabezado-cuestionario.js"></script>
 
 </head>
 <body>
@@ -46,10 +49,7 @@
 
         <section id="parís">
 
-            <h2>
-                <img src="./img/paris.jpg" alt="Una imagen representativa de París">
-                Cuestionario sobre París
-            </h2>
+            <encabezado-cuestionario data-tema="París"></encabezado-cuestionario>
 
             <div class="bloque">
                 <div class="pregunta">
@@ -79,10 +79,7 @@
 
         <section id="londres">
 
-            <h2>
-                <img src="./img/londres.jpeg" alt="Una imagen representativa de Londres">
-                Cuestionario sobre Londres
-            </h2>
+            <encabezado-cuestionario data-tema="Londres"></encabezado-cuestionario>
 
             <div class="bloque">
                 <div class="pregunta">
@@ -103,11 +100,17 @@
 
         </section>
 
+        <!-- Código de prueba -->
+        <section id="Berlín">
+            <encabezado-cuestionario data-tema="Berlín"></encabezado-cuestionario>
+        </section>
+        <!-- Fin del código de prueba-->
+
     </main>
 
     <footer>
-        <span id="nombre">jhb3 | Práctica 2 de Desarollo de Aplicaciones en Internet | Universitat d'Alacant |</span>
-        <span id="tiempo">[14 horas]</span>
+        <span id="nombre">jhb3 | Práctica 3 de Desarollo de Aplicaciones en Internet | Universitat d'Alacant |</span>
+        <span id="tiempo">[16 horas]</span>
     </footer>
 
     <!-- Código javascript asociado -->

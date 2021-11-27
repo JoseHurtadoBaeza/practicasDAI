@@ -95,7 +95,6 @@ function borraPregunta(event) {
 
         removeElement(descripcion); // Borramos el texto descriptivo asociado
         removeElement(cuestionario); // Elmininamos el cuestionario
-        
 
     }
 
@@ -320,13 +319,12 @@ function addPregunta(event){
 /* Función que añade un nuevo cuestionario */ 
 function addCuestionario(event) {
 
-    let formulario = queryAncestorSelector(event.target, "div#nuevoCuestionario"); // Nos guaradamos una referencia al div que contiene el formulario
+    let formulario = queryAncestorSelector(event.target, "div#nuevoCuestionario"); // Nos guardamos una referencia al div que contiene el formulario
 
     // Validamos que ninguno de los campos del formulario haya quedado sin rellenar
     let tema = formulario.querySelector("input[name='tema']");
-    let url = formulario.querySelector("input[name='imagen']");
 
-    if(tema.value.length == 0 || url.value.length == 0) {
+    if(tema.value.length == 0) {
         window.alert("Error al añadir el cuestionario: Todos los campos deben ser rellenados.");
     }
     else {
@@ -336,7 +334,6 @@ function addCuestionario(event) {
         // Creamos y añadimos el título al cuestionario
         let titulo = document.createElement("h2");
         let imagen = document.createElement("img");
-        imagen.src = url.value;
         imagen.alt = "Una imagen representativa de " + tema.value;
         insertAsLastChild(titulo, imagen);
         let nodoTexto = document.createTextNode("Cuestionario sobre " + tema.value);
@@ -366,9 +363,9 @@ function addCuestionario(event) {
 
         addWikipedia(cuestionario.id, nodoFormulario); // Añadimos la descripción de wikipedia al cuestionario
         addFlickr(cuestionario.id, nodoImagen); // Añadimos la foto obtenida de flickr para el cuestionario creado
+        
         // Reseteamos los campos del formulario de adición de cuestionarios
         tema.value = null;
-        url.value = null;
 
     }
 
@@ -395,18 +392,10 @@ function init() {
 
     // Nos guardamos las referencias de cada campo del formulario de creación de cuestionarios
     let tema = document.querySelector("#nuevoCuestionario input[name='tema']");
-    let url = document.querySelector("#nuevoCuestionario input[name='imagen']");
     let botonNuevoFormulario = document.querySelector("#nuevoCuestionario input[value='Crear nuevo cuestionario']");
 
     // Manejador de evento para cuando se pulsa la tecla Enter sobre el cuadro de texto de Tema del cuestionario
     tema.addEventListener("keydown", function(KeyboardEvent){
-        if(KeyboardEvent.key === 'Enter'){
-            addCuestionario(KeyboardEvent);
-        }
-    });
-
-    // Manejador de evento para cuando se pulsa la tecla Enter sobre el cuadro de texto de URL de la imagen
-    url.addEventListener("keydown", function(KeyboardEvent){
         if(KeyboardEvent.key === 'Enter'){
             addCuestionario(KeyboardEvent);
         }

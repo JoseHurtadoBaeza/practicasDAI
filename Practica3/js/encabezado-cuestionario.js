@@ -61,15 +61,21 @@
             .then(function(responseAsObject){ // Procesamos la respuesta para eliminar los [num]
         
                 let pageID = Object.values(responseAsObject.query.pages)[0].pageid;
+
+                // Comprobamos que el término buscado haya devuelto alguna descripción de la api de wikipedia
+                if (pageID != null){
         
-                let textoSinProcesar = responseAsObject.query.pages[pageID].extract;
+                    let textoSinProcesar = responseAsObject.query.pages[pageID].extract;
         
-                var regex = /\[\d+]/g;
-                var replacement = "";
-                let textoProcesado = textoSinProcesar.replace(regex, replacement);
-        
-                componente.shadowRoot.querySelector(".wiki").textContent = textoProcesado;
-        
+                    var regex = /\[\d+]/g;
+                    var replacement = "";
+                    let textoProcesado = textoSinProcesar.replace(regex, replacement);
+            
+                    componente.shadowRoot.querySelector(".wiki").textContent = textoProcesado;
+                } else {
+                    componente.shadowRoot.querySelector(".wiki").textContent = "";
+                }
+
             })
             .catch(function(error) {
                 console.log('Ha habido un problema: \n', error);

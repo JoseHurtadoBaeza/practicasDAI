@@ -66,8 +66,6 @@ function borraPregunta(event) {
 
     let cuestionario = queryAncestorSelector(bloquePregunta, "section"); // Referencia al cuestionario
 
-    let descripcion = querySelector(cuestionario, "div.wiki"); // Rereferencia al texto descriptivo del cuestionario
-
     removeElement(bloquePregunta); // Borramos el bloque con la pregunta
 
     // Si no quedan preguntas en el cuestionario lo borramos así como su enlace y la descripción
@@ -93,7 +91,6 @@ function borraPregunta(event) {
 
         }
 
-        removeElement(descripcion); // Borramos el texto descriptivo asociado
         removeElement(cuestionario); // Elmininamos el cuestionario
 
     }
@@ -331,12 +328,12 @@ function addCuestionario(event) {
 
         let cuestionario = document.createElement("section");
 
-        let componente = document.createElement("encabezado-cuestionario");
-        componente.setAttribute("data-tema", tema);
-        insertAsLastChild(cuestionario, componente);
-
         // Le añadimos el id
         cuestionario.id = tema.value;
+
+        let componente = document.createElement("encabezado-cuestionario");
+        componente.setAttribute("data-tema", cuestionario.id);
+        insertAsLastChild(cuestionario, componente);
 
         // Creamos una nueva entrada en el índice
         let elementoLista = document.createElement("li");
@@ -353,12 +350,9 @@ function addCuestionario(event) {
         let bloqueMain = document.querySelector("main");
         insertAsLastChild(bloqueMain, cuestionario);
 
-        let nodoFormulario = addFormPregunta(cuestionario); // Añadimos el formulario de adición de preguntas al cuestionario
-        let nodoImagen = cuestionario.querySelector("h2 img"); // Nos guardamos una referencia al elemento imagen del cuestionario
+        // Añadimos el formulario de adición de preguntas al cuestionario
+        addFormPregunta(cuestionario);
 
-        addWikipedia(cuestionario.id, nodoFormulario); // Añadimos la descripción de wikipedia al cuestionario
-        addFlickr(cuestionario.id, nodoImagen); // Añadimos la foto obtenida de flickr para el cuestionario creado
-        
         // Reseteamos los campos del formulario de adición de cuestionarios
         tema.value = null;
 
@@ -394,7 +388,7 @@ function init() {
     });
 
     // Manejador de evento para cuando se haga click en el botón de creación de nuevo cuestionario
-    botonNuevoFormulario.addEventListener("click", addCuestionario,false);
+    botonNuevoFormulario.addEventListener("click", addCuestionario, false);
 
 }   
 

@@ -30,10 +30,12 @@
         console.log("Template instanciado");
     </script>
 
-    <h2><img src="" alt="">Cuestionario sobre </h2>
+    <h2></h2>
     <div class="wiki"></div>`;
 
     class Encabezado extends HTMLElement {
+
+        static get observedAttributes() { return ['data-tema'] } // Indicamos los atributos que vamos a controlar su cambio
 
         constructor() {
             super();
@@ -44,13 +46,13 @@
             shadowRoot.appendChild(clone);
         }
 
-        connectedCallback() {
+        attributeChangedCallback(name, oldValue, newValue) {
             
-            var componente = this;
-            this.tema = this.hasAttribute('data-tema')?this.getAttribute('data-tema'):0;
-            this.shadowRoot.querySelector("h2").innerHTML += this.tema;
-            this.shadowRoot.querySelector("img").setAttribute("alt", "Una imagen representativa de " + this.tema);
-        
+            var componente = this; // // Aquí this apunta al shadow host del componente web (clausura)
+            if (name === 'data-tema'){
+                this.tema = this.hasAttribute('data-tema')?newValue:oldValue;
+            }
+
             fetch('https://es.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=extracts&exintro&explaintext&continue&titles=' + componente.tema)
             .then(function(response) { // Obtenemos la respuesta
                 if(!response.ok){
@@ -103,9 +105,16 @@
                         return response.json(); // Convertimos a un objeto javascript
                     })
                     .then(function(responseAsObject){
-            
+                        
+                        let titulo = componente.shadowRoot.querySelector("h2");
+                        titulo.textContent = ""; // Borramos el contenido anterior del titulo para actualizar la información ante un cambio de tema
+                        let imagen = document.createElement('img');
+                        let textoTitulo = document.createTextNode("Cuestionario sobre " + componente.tema);
                         let src = responseAsObject.sizes.size[0].source; // Nos guardamos la referencia a la imagen con el formato más compacto que es la primera
-                        componente.shadowRoot.querySelector("h2 img").setAttribute("src", src);
+                        imagen.setAttribute("src", src);
+                        imagen.setAttribute("alt", "Una imagen representativa de " + componente.tema);
+                        titulo.appendChild(imagen);
+                        titulo.appendChild(textoTitulo);
             
                     })
                     .catch(function(error) {

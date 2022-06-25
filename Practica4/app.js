@@ -1,15 +1,15 @@
 'use strict';
 
-const express = require('express');
-const app = express();  
+const express = require('express'); // Cargamos el módulo de Express que devuelve una función
+const app = express(); // Ejecutamos dicha función y obtenemos el objeto que representa a la aplicación en el servidor
 
-// carga y ejecuta config.js
+// Cargamos y ejecutamos el contenido del fichero config.js
 const config = require('./config.js');
 
-// objeto global que referencia a la librería Knexx.js
+// Inicializamos el objeto knex a null, el cual va a ser la referencia a través de la cual vamos a poder interactuar con la BD con la librería knex de Node
 var knex= null;
 
-// inicializa Knex.js para usar diferentes bases de datos según el entorno:
+// Inicializa Knex.js para usar diferentes bases de datos según el entorno:
 function conectaBD () {
   if (knex===null) {
     var options;
@@ -29,71 +29,86 @@ function conectaBD () {
   }
 }
 
-// crea las tablas si no existen:
+// Crea las tablas si no existen:
 async function creaEsquema(res) {
+
   try {
-    let existeTabla= await knex.schema.hasTable('carritos');
+
+    let existeTabla= await knex.schema.hasTable('cuestionarios');
     if (!existeTabla) {
-      await knex.schema.createTable('carritos', (tabla) => {
-        tabla.increments('carritoId').primary();
-        tabla.string('nombre', 100).notNullable();
+      await knex.schema.createTable('cuestionarios', (tabla) => {
+        tabla.increments('cuestionarioId').primary();
+        tabla.string('tema', 100).notNullable();
       });
-      console.log("Se ha creado la tabla carritos");
+      console.log("Se ha creado la tabla cuestionarios");
     }
-    existeTabla= await knex.schema.hasTable('productos');
+
+    existeTabla= await knex.schema.hasTable('preguntas');
     if (!existeTabla) {
-      await knex.schema.createTable('productos', (table) => {
-        table.increments('productoId').primary();
-        table.string('carrito', 100).notNullable();
-        table.string('item', 100).notNullable();
-        table.integer('cantidad').unsigned().notNullable();
-        table.integer('precio').unsigned().notNullable();
+      await knex.schema.createTable('preguntas', (table) => {
+        table.string('preguntaId').primary();
+        table.string('temaId', 100).unsigned().notNullable();
+        table.string('textoPregunta', 100).notNullable();
+        table.integer('respuestaCorrecta').notNullable(); // Verdadero/True es 1 y Falso/False es 0
+
+        // Definimos la clave ajena:
+        table.foreign('temaId').references('cuestionarios.tema');
+
       });
-      console.log("Se ha creado la tabla productos");
+      console.log("Se ha creado la tabla preguntas");
     }
+
   }
   catch (error) {
     console.log(`Error al crear las tablas: ${error}`);
     res.status(404).send({ result:null,error:'error al crear la tabla; contacta con el administrador' });
   }
+
 }
 
-async function numeroCarritos() {
-  let n= await knex('carritos').countDistinct('nombre as n');
+async function numeroCuestionarios() {
+  let n= await knex('cuestionarios').countDistinct('tema as n');
   // the value returned by count in this case is an array of objects like [ { n: 2 } ]
   return n[0]['n'];
 }
 
-async function numeroItems(carrito) {
-  let r= await knex('productos').select('item')
-                                .where('carrito',carrito);
+async function numeroPreguntas(temaCuestionario) {
+  let r= await knex('preguntas').select('preguntaId')
+                                .where('temaId',temaCuestionario);
   return r.length;
 }
 
-async function existeCarrito(carrito) {
-  let r= await knex('carritos').select('nombre')
-                               .where('nombre',carrito);
+async function existeCuestionario(temaCuestionario) {
+  let r= await knex('cuestionarios').select('tema')
+                                    .where('tema',temaCuestionario);
   return r.length>0;
 }
 
-async function existeItem(item,carrito,precio) {
-  let r= await knex('productos').select('item')
-                                .where('item',item)
-                                .andWhere('carrito',carrito);
+async function existePregunta(temaCuestionario) {
+  let r= await knex('preguntas').select('temaId')
+                                .where('temaId',temaCuestionario);
+
   return r.length>0;
 }
 
+async function getIdCuestionario(temaCuestionario) {
+  let id = await knex('cuestionarios').select('cuestionarioId')
+                                      .where('tema', temaCuestionario);
 
-// convierte el cuerpo del mensaje de la petición en JSON al objeto de JavaScript req.body:
+  return id;
+}
+
+
+// Convierte el cuerpo del mensaje de la petición en JSON al objeto de JavaScript req.body:
 app.use(express.json());
 
-// middleware para descodificar caracteres UTF-8 en la URL:
+// Middleware para descodificar caracteres UTF-8 en la URL:
 app.use( (req, res, next) => {
   req.url = decodeURI(req.url);
   next();
 });
 
-// middleware para las cabeceras de CORS:
+// Middleware para las cabeceras de CORS:
 app.use( (req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header('Access-Control-Allow-Methods', 'DELETE, PUT, GET, POST, OPTIONS');
@@ -102,7 +117,7 @@ app.use( (req, res, next) => {
 });
 
 
-// middleware que establece la conexión con la base de datos y crea las 
+// Middleware que establece la conexión con la base de datos y crea las 
 // tablas si no existen; en una aplicación más compleja se crearía el
 // esquema fuera del código del servidor:
 app.use( async (req, res, next) => {
@@ -112,25 +127,38 @@ app.use( async (req, res, next) => {
 });
 
 
-// crea un carrito:
-app.post(config.app.base+'/creacarrito', async (req,res) => {
+// Añadir un tema de cuestionario (POST) y devolver el id asignado en la base de datos:
+app.post(config.app.base+'/creacuestionario/:tema', async (req,res) => {
   try {
-    let n= await numeroCarritos();
-    if (n>=config.app.maxCarritos) {
-      res.status(404).send({ result:null,error:'No caben más carritos; contacta con el administrador' });
+
+    // Empezamos comprobando que no se haya alcanzado el máximo de cuestionarios en la BD
+    let n= await numeroCuestionarios();
+    if (n>=config.app.maxCuestionarios) {
+      res.status(404).send({ result:null,error:'No caben más cuestionarios; contacta con el administrador' });
       return;
     }
-    let existe= true;
-    while (existe) {
-      var nuevo = Math.random().toString(36).substring(7);
-      existe= await existeCarrito(nuevo);
+
+    // Comprobamos si ya existe un cuestionario con el mismo tema
+    let yaExiste = false;
+    //while (!yaExiste) {
+      //var nuevo = Math.random().toString(36).substring(7);
+    yaExiste = await existeCuestionario(req.params.tema);
+    //}
+    if (yaExiste) {
+      res.status(404).send({ result:null, error:'Ya existe un cuestionario cuyo tema es ' + req.params.tema });
     }
-    var c= { nombre:nuevo };
-    await knex('carritos').insert(c);
-    res.status(200).send({ result:{ nombre:nuevo },error:null });
+
+    var cuestionario = { tema:req.params.tema }; // Creamos un objeto de tipo cuestionario
+    await knex('cuestionarios').insert(cuestionario); // Lo insertamos en la BD
+
+    // Obtenemos el id del cuestionario recién creado
+    let idNuevoCuestionario = getIdCuestionario(req.params.tema)
+
+    res.status(200).send({ result:{ cuestionarioId:idNuevoCuestionario },error:null }); // Devolvemos el id del cuestionario creado
+
   } catch (error) {
-    console.log(`No se puede crear el carrito: ${error}`);
-    res.status(404).send({ result:null,error:'no se pudo crear el carrito' });
+    console.log(`No se puede crear el cuestionario: ${error}`);
+    res.status(404).send({ result:null,error:'no se pudo crear el cuestionario' });
   }
 });
 
@@ -295,11 +323,12 @@ app.get(config.app.base+'/clear', async (req,res) => {
 
 
 const path = require('path');
+const { read } = require('fs');
 const publico = path.join(__dirname, 'public');
 // __dirname: directorio del fichero que se está ejecutando
 
 app.get(config.app.base+'/', (req, res) => {
-  res.status(200).send('API web para gestionar carritos de la compra');
+  res.status(200).send('API web para gestionar los cuestionarios y las preguntas');
 });
 
 app.get(config.app.base+'/ayuda', (req, res) => res.sendFile(path.join(publico, 'index.html')));

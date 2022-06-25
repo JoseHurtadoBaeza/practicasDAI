@@ -362,7 +362,7 @@ function addCuestionario(event) {
 
 function init() {
 
-    let preguntas = document.querySelectorAll(".bloque"); // Nos guardamos todos las preguntas
+    /*let preguntas = document.querySelectorAll(".bloque"); // Nos guardamos todos las preguntas
 
     // Añadimos la cruz a cada una de las preguntas de los cuestionarios
     for(let i = 0; i < preguntas.length; i++) {
@@ -374,7 +374,7 @@ function init() {
     // Añadimos el formulario de adición de preguntas a todos los cuestionarios
     for(let i = 0; i < cuestionarios.length; i++){
         addFormPregunta(cuestionarios[i]);
-    } 
+    }*/ 
 
     // Nos guardamos las referencias de cada campo del formulario de creación de cuestionarios
     let tema = document.querySelector("#nuevoCuestionario input[name='tema']");

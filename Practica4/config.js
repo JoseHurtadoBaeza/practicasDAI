@@ -41,8 +41,8 @@ config.localbd= {
 
 config.app= {
   base: '/carrito/v1',
-  maxCarritos: 500,
-  maxProductos: 20
+  maxCuestionarios: 500,
+  maxPreguntas: 20
 }
 
 module.exports = config;

@@ -145,7 +145,7 @@ app.post(config.app.base+'/creacuestionario/:tema', async (req,res) => {
     yaExiste = await existeCuestionario(req.params.tema);
     //}
     if (yaExiste) {
-      res.status(404).send({ result:null, error:'Ya existe un cuestionario cuyo tema es ' + req.params.tema });
+      res.status(404).send({ result:null, error:`Ya existe un cuestionario cuyo tema es ${req.params.tema}` });
     }
 
     var cuestionario = { tema:req.params.tema }; // Creamos un objeto de tipo cuestionario
@@ -276,7 +276,7 @@ app.delete(config.app.base+'/:carrito/productos/:item', async (req, res) => {
     }
     existe= await existeItem(req.params.item,req.params.carrito);
     if (!existe) {
-      res.status(404).send({ result:null,error:`item ${req.paramsº.item} no existente` });
+      res.status(404).send({ result:null,error:`item ${req.params.item} no existente` });
       return;
     }
     await knex('productos').where('carrito',req.params.carrito).andWhere('item',req.params.item).del();
@@ -288,23 +288,29 @@ app.delete(config.app.base+'/:carrito/productos/:item', async (req, res) => {
 });
 
 
-// borra un carrito:
-app.delete(config.app.base+'/:carrito', async (req, res) => {
+// Borrar un tema a partir de su id y todas sus preguntas (DELETE)
+app.delete(config.app.base+'/:temaCuestionario', async (req, res) => {
+
   try {
-    let existe= await existeCarrito(req.params.carrito);
+
+    // Comprobamos si existe un cuestionario del tema indicado
+    let existe= await existeCuestionario(req.params.temaCuestionario);
     if (!existe) {
-      res.status(404).send({ result:null,error:`carrito ${req.params.carrito} no existente` });
+      res.status(404).send({ result:null,error:`No existe ningún cuestionario cuyo tema sea ${req.params.temaCuestionario}` });
       return;  
     }
-    await knex('productos').where('carrito',req.params.carrito)
+
+    await knex('preguntas').where('temaId',req.params.temaCuestionario)
                            .del();
-    await knex('carritos').where('nombre',req.params.carrito)
+    await knex('cuestionarios').where('tema',req.params.temaCuestionario)
                           .del();
     res.status(200).send({ result:'ok',error:null });
+    
   } catch (error) {
-    console.log(`No se pudo encontrar el carrito: ${error}`);
-    res.status(404).send({ result:null,error:'no se pudo encontrar el carrito' });
+    console.log(`No se pudo encontrar el cuestionario: ${error}`);
+    res.status(404).send({ result:null,error:'no se pudo encontrar el cuestionario' });
   }
+
 });
 
 

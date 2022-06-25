@@ -1,6 +1,29 @@
 /* Añade un icono para borrar cada pregunta de los cuestionarios */
 'use strict';
 
+// Endpoint de la API de los cuestionarios:
+const base="/cuestionarios/v1";
+
+const cabeceras= {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json',
+}
+
+function print(r) {
+  const e= document.querySelector('#mensaje');  
+  if(r.result) {
+    e.textContent= JSON.stringify(r.result);
+  }
+  else {
+    e.textContent= JSON.stringify(r.error);
+  }
+}
+
+function printError(s) {
+  const e= document.querySelector('#mensaje');  
+  e.textContent= `Problema de conexión: ${s}`;
+}
+
 function addCruz(nodo) {
 
     let cruz = document.createElement("div");
@@ -59,6 +82,27 @@ function queryAncestorSelector(node, selector){
 
 }
 
+/* Función que borra un cuestionario y todas sus preguntas de la BD */
+function eliminaCuestionarioBD (event, cuestionario) {
+
+    event.preventDefault(); // Evitamos la recarga de la página
+    const url= `${base}/${cuestionario.id}`;
+    const payload= {};
+    var request = {
+        method: 'DELETE', 
+        headers: cabeceras,
+        body: JSON.stringify(payload),
+    };
+    fetch(url,request)
+    .then( response => response.json() )
+    .then( r  => {
+        //print(r); 
+        //muestraCarrito();
+        return true;
+    })
+    .catch( () => {return false} );
+}
+
 /* Función que nos permite borrar preguntas de los cuestionarios */
 function borraPregunta(event) {
 
@@ -71,6 +115,11 @@ function borraPregunta(event) {
     // Si no quedan preguntas en el cuestionario lo borramos así como su enlace y la descripción
     if(cuestionario.querySelector(".bloque") == null){
         
+        let eliminado = eliminaCuestionarioBD(event, cuestionario);
+
+        // Si el cuestionario se ha borrado correctamente en la BD
+        if (eliminado){
+
         // Nos guardamos todos los enlaces actuales
         let links = document.querySelectorAll("header nav ul a");
 
@@ -91,7 +140,8 @@ function borraPregunta(event) {
 
         }
 
-        removeElement(cuestionario); // Elmininamos el cuestionario
+            removeElement(cuestionario); // Elmininamos el cuestionario
+        }
 
     }
 
@@ -281,6 +331,7 @@ function addPregunta(event){
         // Generamos el HTML correspondiente a una bloque de pregunta
         let nuevoBloque = document.createElement("div");
         nuevoBloque.className = "bloque";
+        nuevoBloque.setAttribute("data-preguntaId", "") // Atributo para guardar el id de la pregunta en la BD
 
         let pregunta = document.createElement("div");
         pregunta.className = "pregunta";
@@ -313,6 +364,30 @@ function addPregunta(event){
 
 }
 
+/* Función que crea un cuestionario en la BD */
+function creaCuestionarioBD(event, cuestionario) {
+
+    event.preventDefault(); // Evitamos la recarga de toda la página
+    const url= `${base}/creacuestionario/${cuestionario.id}`;
+    const payload= {};
+    const request = {
+        method: 'POST', 
+        headers: cabeceras,
+        body: JSON.stringify(payload),
+    };
+    fetch(url,request)
+    .then( response => response.json() )
+    .then( r => {
+        let cuestionarioId = r.result.cuestionarioId;
+        cuestionario.setAttribute("data-cuestionarioId", cuestionarioId);
+        //muestraCarrito();
+        //print(r);
+        return true;
+    })
+    .catch( () => {return false} );
+
+}
+
 /* Función que añade un nuevo cuestionario */ 
 function addCuestionario(event) {
 
@@ -328,33 +403,41 @@ function addCuestionario(event) {
 
         let cuestionario = document.createElement("section");
 
-        // Le añadimos el id
-        cuestionario.id = tema.value;
+        cuestionario.id = tema.value; // Le añadimos el id
+        cuestionario.setAttribute("data-cuestionarioId", ""); // Atributo para guardar el id del cuestionario en la BD
 
-        let componente = document.createElement("encabezado-cuestionario");
-        componente.setAttribute("data-tema", cuestionario.id);
-        insertAsLastChild(cuestionario, componente);
-
-        // Creamos una nueva entrada en el índice
-        let elementoLista = document.createElement("li");
-        let enlace = document.createElement("a");
-        enlace.href = "#" + cuestionario.id;
-        enlace.textContent = tema.value;
-        insertAsLastChild(elementoLista, enlace);
-
-        // Obtenemos una referencia a la lista no ordenada del elemento nav
-        let listaUl = document.querySelector("header nav ul");
-        insertAsLastChild(listaUl, elementoLista);
+        // Creamos el cuestionario en la BD
+        let creado = creaCuestionarioBD(event, cuestionario);
         
-        // Añadimos el cuestionario como último hijo del main
-        let bloqueMain = document.querySelector("main");
-        insertAsLastChild(bloqueMain, cuestionario);
+        // Si se ha podido crear el cuestionario correctamente
+        if (creado) {
 
-        // Añadimos el formulario de adición de preguntas al cuestionario
-        addFormPregunta(cuestionario);
+            let componente = document.createElement("encabezado-cuestionario");
+            componente.setAttribute("data-tema", cuestionario.id);
+            insertAsLastChild(cuestionario, componente);
+    
+            // Creamos una nueva entrada en el índice
+            let elementoLista = document.createElement("li");
+            let enlace = document.createElement("a");
+            enlace.href = "#" + cuestionario.id;
+            enlace.textContent = tema.value;
+            insertAsLastChild(elementoLista, enlace);
+    
+            // Obtenemos una referencia a la lista no ordenada del elemento nav
+            let listaUl = document.querySelector("header nav ul");
+            insertAsLastChild(listaUl, elementoLista);
+            
+            // Añadimos el cuestionario como último hijo del main
+            let bloqueMain = document.querySelector("main");
+            insertAsLastChild(bloqueMain, cuestionario);
+    
+            // Añadimos el formulario de adición de preguntas al cuestionario
+            addFormPregunta(cuestionario);
+    
+            // Reseteamos los campos del formulario de adición de cuestionarios
+            tema.value = null;
 
-        // Reseteamos los campos del formulario de adición de cuestionarios
-        tema.value = null;
+        }
 
     }
 

@@ -40,7 +40,7 @@ config.localbd= {
 }
 
 config.app= {
-  base: '/carrito/v1',
+  base: '/cuestionarios/v1',
   maxCuestionarios: 500,
   maxPreguntas: 20
 }

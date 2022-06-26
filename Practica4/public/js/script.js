@@ -105,12 +105,13 @@ function borraPregunta(event) {
             body: JSON.stringify(payload),
         };
         fetch(url,request)
-        .then( response => {
+        /*.then( response => {
             if (!response.ok){
                 throw new Error("No se ha podido establecer la conexión con el servidor")
             }
             response.json() 
-        })
+        })*/
+        .then( response => response.json())
         .then( r  => {
             if (r.error != null) {
                 throw new Error("Error al borrar el cuestionario cuyo tema es " + cuestionario.id + ":" + r.error);
@@ -378,7 +379,7 @@ function insertaCuestionario(cuestionario){
     let elementoLista = document.createElement("li");
     let enlace = document.createElement("a");
     enlace.href = "#" + cuestionario.getAttribute("data-identificadorBD");
-    enlace.textContent = tema.value;
+    enlace.textContent = cuestionario.id;
     insertAsLastChild(elementoLista, enlace);
 
     // Obtenemos una referencia a la lista no ordenada del elemento nav
@@ -422,12 +423,13 @@ function addCuestionario(event) {
             body: JSON.stringify(payload),
         };
         fetch(url,request)
-        .then( response => {
+        /*.then( response => {
             if (!response.ok){
                 throw new Error("No se ha podido establecer la conexión con el servidor")
             }
             response.json() 
-        })
+        })*/
+        .then( response => response.json())
         .then( r => {
             if (r.error != null){
                 throw new Error("Error al crear el cuestionario cuyo tema es " + cuestionario.id + ":" + r.error);
@@ -477,12 +479,12 @@ function init() {
         headers: cabeceras,
     };
     fetch(url,request)
-    .then( response => {
+    /*.then( response => 
         if (!response.ok){
             throw new Error("No se ha podido establecer la conexión con el servidor")
         }
-        response.json() 
-    })
+        response.json())*/
+    .then( response => response.json())
     .then( r => {
 
         if (r.error != null){

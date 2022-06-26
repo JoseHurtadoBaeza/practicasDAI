@@ -202,11 +202,11 @@ app.get(config.app.base+'/cuestionarios', async (req, res) => {
 
     let cuestionarios = await knex('cuestionarios').select('*');
 
-    if (cuestionarios.length > 0) {
+    //if (cuestionarios.length > 0) {
         res.status(200).send({ result:cuestionarios, error:null });
-    } else {
+    /*} else {
         throw new Error("No existe ningún cuestionario en la BD")
-    }
+    }*/
 
   } catch (error) {
     console.log(`No se pueden obtener los cuestionarios: ${error}`);

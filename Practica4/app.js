@@ -195,21 +195,24 @@ app.post(config.app.base+'/:carrito/productos', async (req, res) => {
 });
 
 
-// lista los items de un carrito:
-app.get(config.app.base+'/:carrito/productos', async (req, res) => {
+// Recuperar todos los temas de cuestionario (GET)
+app.get(config.app.base+'/cuestionarios', async (req, res) => {
+  
   try {
-    let existe= await existeCarrito(req.params.carrito);
-    if (!existe) {
-      res.status(404).send({ result:null,error:`carrito ${req.params.carrito} no existente` });
-      return;  
+
+    let cuestionarios = await knex('cuestionarios').select('*');
+
+    if (cuestionarios.length > 0) {
+        res.status(200).send({ result:cuestionarios, error:null });
+    } else {
+        throw new Error("No existe ningún cuestionario en la BD")
     }
-    let i= await knex('productos').select(['item','cantidad','precio'])
-                                  .where('carrito',req.params.carrito);
-    res.status(200).send({ result:i,error:null });
+
   } catch (error) {
-    console.log(`No se puede obtener los productos del carrito: ${error}`);
-    res.status(404).send({ result:null,error:'no se pudo obtener los datos del carrito' });
+    console.log(`No se pueden obtener los cuestionarios: ${error}`);
+    res.status(404).send({ result:null, error:`No se pueden obtener los cuestionarios: ${error}`});
   }
+
 });
 
 

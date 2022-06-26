@@ -435,7 +435,6 @@ function addCuestionario(event) {
 
             if (r.result){
                 let cuestionarioId = r.result.cuestionarioId;
-                console.log("El id del cuestionario en la BD es: ", cuestionarioId);
                 cuestionario.setAttribute("data-identificadorbd", cuestionarioId); // Atributo para guardar el id del cuestionario en la BD
                 insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main del html
             }

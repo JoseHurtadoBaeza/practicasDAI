@@ -134,8 +134,8 @@ app.post(config.app.base+'/creacuestionario/:tema', async (req,res) => {
     // Empezamos comprobando que no se haya alcanzado el máximo de cuestionarios en la BD
     let n= await numeroCuestionarios();
     if (n>=config.app.maxCuestionarios) {
-      res.status(404).send({ result:null,error:'No caben más cuestionarios; contacta con el administrador' });
-      return;
+        res.status(404).send({ result:null,error:'No caben más cuestionarios; contacta con el administrador' });
+        return;
     }
 
     // Comprobamos si ya existe un cuestionario con el mismo tema
@@ -145,7 +145,8 @@ app.post(config.app.base+'/creacuestionario/:tema', async (req,res) => {
     yaExiste = await existeCuestionario(req.params.tema);
     //}
     if (yaExiste) {
-      res.status(404).send({ result:null, error:`Ya existe un cuestionario cuyo tema es ${req.params.tema}` });
+        res.status(404).send({ result:null, error:`Ya existe un cuestionario cuyo tema es ${req.params.tema}` });
+        return;
     }
 
     var cuestionario = { tema:req.params.tema }; // Creamos un objeto de tipo cuestionario
@@ -203,7 +204,7 @@ app.get(config.app.base+'/cuestionarios', async (req, res) => {
     let cuestionarios = await knex('cuestionarios').select('*');
 
     //if (cuestionarios.length > 0) {
-        res.status(200).send({ result:cuestionarios, error:null });
+    res.status(200).send({ result:cuestionarios, error:null });
     /*} else {
         throw new Error("No existe ningún cuestionario en la BD")
     }*/

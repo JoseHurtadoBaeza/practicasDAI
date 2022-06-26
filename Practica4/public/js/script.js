@@ -412,8 +412,6 @@ function addCuestionario(event) {
 
         cuestionario.id = tema.value; // Le añadimos el id
 
-        let creado = false;
-
         event.preventDefault(); // Evitamos la recarga de toda la página
         const url= `${base}/creacuestionario/${cuestionario.id}`;
         const payload= {};
@@ -436,16 +434,9 @@ function addCuestionario(event) {
             }
             let cuestionarioId = r.result.cuestionarioId;
             cuestionario.setAttribute("data-identificadorBD", cuestionarioId); // Atributo para guardar el id del cuestionario en la BD
-            creado = true;
+            insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main del html
         })
         .catch( (error) => alert(error) );
-        
-        // Si se ha podido crear el cuestionario correctamente
-        if (creado) {
-
-            insertaCuestionario(cuestionario);
-
-        }
 
         // Reseteamos los campos del formulario de adición de cuestionarios
         tema.value = null;

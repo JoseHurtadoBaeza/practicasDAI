@@ -335,7 +335,7 @@ function addPregunta(event){
         // Generamos el HTML correspondiente a una bloque de pregunta
         let nuevoBloque = document.createElement("div");
         nuevoBloque.className = "bloque";
-        nuevoBloque.setAttribute("data-identificadorBD", ""); // Atributo para guardar el id de la pregunta en la BD
+        nuevoBloque.setAttribute("data-identificadorbd", ""); // Atributo para guardar el id de la pregunta en la BD
 
         let pregunta = document.createElement("div");
         pregunta.className = "pregunta";
@@ -378,7 +378,7 @@ function insertaCuestionario(cuestionario){
     // Creamos una nueva entrada en el índice
     let elementoLista = document.createElement("li");
     let enlace = document.createElement("a");
-    enlace.href = "#" + cuestionario.getAttribute("data-identificadorBD");
+    enlace.href = "#" + cuestionario.getAttribute("data-identificadorbd");
     enlace.textContent = cuestionario.id;
     insertAsLastChild(elementoLista, enlace);
 
@@ -432,9 +432,13 @@ function addCuestionario(event) {
             if (r.error != null){
                 throw new Error("Error al crear el cuestionario cuyo tema es " + cuestionario.id + ":" + r.error);
             }
-            let cuestionarioId = r.result.cuestionarioId;
-            cuestionario.setAttribute("data-identificadorBD", cuestionarioId); // Atributo para guardar el id del cuestionario en la BD
-            insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main del html
+
+            if (r.result){
+                let cuestionarioId = r.result.cuestionarioId;
+                console.log("El id del cuestionario en la BD es: ", cuestionarioId);
+                cuestionario.setAttribute("data-identificadorbd", cuestionarioId); // Atributo para guardar el id del cuestionario en la BD
+                insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main del html
+            }
         })
         .catch( (error) => alert(error) );
 
@@ -486,8 +490,8 @@ function init() {
             for(var i=0;i<r.result.length;i++) {
 
                 let cuestionario = document.createElement("section");
-                cuestionario.setAttribute("data-identificadorBD", r.result[i].cuestionarioId);
                 cuestionario.id = r.result[i].tema; // Le añadimos el id
+                cuestionario.setAttribute("data-identificadorbd", r.result[i].cuestionarioId);
 
                 insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main
 

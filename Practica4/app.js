@@ -95,7 +95,7 @@ async function getIdCuestionario(temaCuestionario) {
   let id = await knex('cuestionarios').select('cuestionarioId')
                                       .where('tema', temaCuestionario);
 
-  return id;
+  return id[0]['cuestionarioId'];
 }
 
 
@@ -152,7 +152,7 @@ app.post(config.app.base+'/creacuestionario/:tema', async (req,res) => {
     await knex('cuestionarios').insert(cuestionario); // Lo insertamos en la BD
 
     // Obtenemos el id del cuestionario recién creado
-    let idNuevoCuestionario = getIdCuestionario(req.params.tema)
+    let idNuevoCuestionario = await getIdCuestionario(req.params.tema);
 
     res.status(200).send({ result:{ cuestionarioId:idNuevoCuestionario },error:null }); // Devolvemos el id del cuestionario creado
 

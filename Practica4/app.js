@@ -52,7 +52,7 @@ async function creaEsquema(res) {
         table.integer('respuestaCorrecta').notNullable(); // Verdadero/True es 1 y Falso/False es 0
 
         // Definimos la clave ajena:
-        table.foreign('temaId').references('cuestionarios.tema');
+        table.foreign('temaId').references('cuestionarios.cuestionarioId');
 
       });
       console.log("Se ha creado la tabla preguntas");
@@ -78,9 +78,9 @@ async function numeroPreguntas(temaCuestionario) {
   return r.length;
 }
 
-async function existeCuestionario(temaCuestionario) {
-  let r= await knex('cuestionarios').select('tema')
-                                    .where('tema',temaCuestionario);
+async function existeCuestionario(cuestionarioId) {
+  let r= await knex('cuestionarios').select('cuestionarioId')
+                                    .where('cuestionarioId',cuestionarioId);
   return r.length>0;
 }
 
@@ -88,6 +88,13 @@ async function existePregunta(tema, textoPregunta) {
   let r = await knex('preguntas').select('*')
                                 .where('textoPregunta',textoPregunta)
                                 .andWhere('temaId', tema);
+
+  return r.length>0;
+}
+
+async function existePreguntaPorId(preguntaId) {
+  let r = await knex('preguntas').select('preguntaId')
+                                .where('preguntaId',preguntaId);
 
   return r.length>0;
 }
@@ -186,7 +193,7 @@ app.post(config.app.base+'/:tema/pregunta', async (req, res) => {
     // Comprobamos si ya existe una pregunta con el mismo texto
     existe= await existePregunta(req.params.tema, req.body.textoPregunta);
     if (existe) {
-      res.status(404).send({ result:null,error:`pregunta sobre el tema ${req.params.tema} y con el texto pasado ya existente` });
+      res.status(404).send({ result:null,error:`pregunta sobre el tema ${req.params.tema} y con el enunciado pasado ya existente` });
       return;
     }
 
@@ -286,45 +293,46 @@ app.put(config.app.base+'/:carrito/productos/:item', async (req, res) => {
 });
 
 
-// borra un item:
-app.delete(config.app.base+'/:carrito/productos/:item', async (req, res) => {
+// Borrar una pregunta dado su id (DELETE)
+app.delete(config.app.base+'/pregunta/:preguntaId', async (req, res) => {
+
   try {
-    let existe= await existeCarrito(req.params.carrito);
+
+    // Comprobamos si existe alguna pregunta con el id indicado
+    let existe = await existePreguntaPorId(req.params.preguntaId);
     if (!existe) {
-      res.status(404).send({ result:null,error:`carrito ${req.params.carrito} no existente` });
-      return;  
-    }
-    existe= await existeItem(req.params.item,req.params.carrito);
-    if (!existe) {
-      res.status(404).send({ result:null,error:`item ${req.params.item} no existente` });
+      res.status(404).send({ result:null,error:`pregunta con id ${req.params.preguntaId} no existente` });
       return;
     }
-    await knex('productos').where('carrito',req.params.carrito).andWhere('item',req.params.item).del();
-    res.status(200).send({ result:'ok',error:null });
+
+    await knex('preguntas').where('preguntaId',req.params.preguntaId).del(); // Borramos la pregunta que corresponda al id indicado por parámetro
+    res.status(200).send({ result:`pregunta con id ${req.params.preguntaId} borrada correctamente`,error:null });
+
   } catch (error) {
-    console.log(`No se pudo obtener el item: ${error}`);
-    res.status(404).send({ result:null,error:'no se pudo obtener el item' });
+    console.log(`No se pudo borrar la pregunta: ${error}`);
+    res.status(404).send({ result:null,error:'no se pudo borrar la pregunta' });
   }
+
 });
 
 
-// Borrar un tema a partir de su id y todas sus preguntas (DELETE)
-app.delete(config.app.base+'/:temaCuestionario', async (req, res) => {
+// Borrar un cuestionario a partir de su id y todas sus preguntas (DELETE)
+app.delete(config.app.base+'/:cuestionarioId', async (req, res) => {
 
   try {
 
     // Comprobamos si existe un cuestionario del tema indicado
-    let existe= await existeCuestionario(req.params.temaCuestionario);
+    let existe= await existeCuestionario(req.params.cuestionarioId);
     if (!existe) {
-      res.status(404).send({ result:null,error:`No existe ningún cuestionario cuyo tema sea ${req.params.temaCuestionario}` });
+      res.status(404).send({ result:null,error:`No existe ningún cuestionario con id ${req.params.cuestionarioId}` });
       return;  
     }
 
-    await knex('preguntas').where('temaId',req.params.temaCuestionario)
+    await knex('preguntas').where('temaId',req.params.cuestionarioId)
                            .del();
-    await knex('cuestionarios').where('tema',req.params.temaCuestionario)
+    await knex('cuestionarios').where('cuestionarioId',req.params.cuestionarioId)
                           .del();
-    res.status(200).send({ result:'ok',error:null });
+    res.status(200).send({ result:`cuestionario con id ${req.params.cuestionarioId} borrado correctamente`,error:null });
     
   } catch (error) {
     console.log(`No se pudo encontrar el cuestionario: ${error}`);

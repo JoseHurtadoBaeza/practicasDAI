@@ -89,15 +89,37 @@ function borraPregunta(event) {
 
     let cuestionario = queryAncestorSelector(bloquePregunta, "section"); // Referencia al cuestionario
 
-    removeElement(bloquePregunta); // Borramos el bloque con la pregunta
+    let preguntaId = bloquePregunta.getAttribute("data-identificadorbd"); 
+
+    event.preventDefault();
+    const url= `${base}/pregunta/${preguntaId}`;
+    const payload= {}; 
+    var request = {
+        method: 'DELETE', 
+        headers: cabeceras,
+        body: JSON.stringify(payload),
+    };
+    fetch(url,request)
+    .then( response => response.json() )
+    .then( r => {
+
+        if (r.error != null){
+            throw new Error("Error al borrar la pregunta con id " + preguntaId + ":" + r.error);
+        }
+
+        removeElement(bloquePregunta); // Borramos el bloque con la pregunta
+
+    })
+    .catch( error => window.alert(error) );
 
     // Si no quedan preguntas en el cuestionario lo borramos así como su enlace y la descripción
     if(cuestionario.querySelector(".bloque") == null){
         
         let eliminado = false;
+        let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
 
         event.preventDefault(); // Evitamos la recarga de la página
-        const url= `${base}/${cuestionario.id}`;
+        const url= `${base}/${cuestionarioId}`;
         const payload= {};
         var request = {
             method: 'DELETE', 
@@ -114,7 +136,7 @@ function borraPregunta(event) {
         .then( response => response.json())
         .then( r  => {
             if (r.error != null) {
-                throw new Error("Error al borrar el cuestionario cuyo tema es " + cuestionario.id + ":" + r.error);
+                throw new Error("Error al borrar el cuestionario cuyo tema es " + cuestionarioId + ":" + r.error);
             }
             eliminado = true;
         })
@@ -341,10 +363,10 @@ function addPregunta(event){
         }
         
         let section = queryAncestorSelector(formulario, "section");
-        let tema = section.id;
+        let cuestionarioId = section.getAttribute("data-identificadorbd");
 
         event.preventDefault(); // Prevenimos la recarga de la página
-        const url= `${base}/${tema}/pregunta`;
+        const url= `${base}/${cuestionarioId}/pregunta`;
         const payload= {
             textoPregunta:enunciado.value,
             respuestaCorrecta:respuestaCorrecta,
@@ -359,7 +381,7 @@ function addPregunta(event){
         .then( r => {
 
             if (r.error != null){
-                throw new Error("Error al crear la pregunta cuyo tema es " + tema + ":" + r.error);
+                throw new Error("Error al crear la pregunta para el cuestionario con id " + cuestionarioId + ":" + r.error);
             }
 
             if (r.result){

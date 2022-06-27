@@ -1,0 +1,11 @@
+Hola Juan Antonio, mire estoy realizando la práctica 4 de cara al examen de prácticas de julio y bueno me han surgido un par de dudas.
+
+La primera de ellas es respecto a este servicio web -> "recuperar todos los temas (GET);"
+A mi entender, tengo que devolver todos los cuestionarios de la bd, es decir, cada cuestionario con su identificador y su tema, no únicamente el tema de cada cuestionario. Corríjame si me equivoco.
+
+Por otro lado, tengo una duda respecto a la parte del enunciado donde se nos dice lo siguiente -> "todas tus peticiones Fetch definirán una función que muestre una ventana de alerta similar ante el resto de posibles situaciones de error (por ejemplo, no se puede establecer la conexión con el servidor)".
+Y es que no se exactamente a lo que se refiere con lo de definir una función que muestre una ventana de alerta similar, es decir, no puedo usar sin más la función alert, sino que tengo que implementar una función anónima?? O es que tenemos que usar async y await para realizar nuestros fetch de la parte cliente y así poder gestionar mejor los distintos errores que puedan surgir??
+
+Le mando una captura de cómo tengo implementado uno de mis fetch en el cliente para que me diga si voy bien encaminado o tengo que modificar algunas cosas.
+
+Un saludo.

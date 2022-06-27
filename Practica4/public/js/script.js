@@ -371,16 +371,17 @@ function addPregunta(event){
 
                 let pregunta = document.createElement("div");
                 pregunta.className = "pregunta";
-                pregunta.innerHTML = payload.textoPregunta;
+                pregunta.innerHTML = payload.textoPregunta; // Obtenemos el valor del payload, porque no podemos acceder al valor de las variables externas
                 insertAsLastChild(nuevoBloque, pregunta);
 
                 let respuesta = document.createElement("div");
                 respuesta.className = "respuesta";
                 
-                if(respuestaVerdadero.checked){
+                // No podemos consultar los valores de las variables externas, así que consultamos el payload
+                if(payload.respuestaCorrecta == "Verdadero"){
                     respuesta.setAttribute("data-valor", "true");
                 }
-                else{
+                else if(payload.respuestaCorrecta == "Falso"){
                     respuesta.setAttribute("data-valor", "false");
                 }
 

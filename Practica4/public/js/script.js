@@ -118,7 +118,7 @@ function borraPregunta(event) {
             }
             eliminado = true;
         })
-        .catch( (error) => alert(error) );
+        .catch( (error) => window.alert(error) );
 
         // Si el cuestionario se ha borrado correctamente en la BD
         if (eliminado){
@@ -320,7 +320,7 @@ function addFormPregunta(nodoSection) {
 function addPregunta(event){
 
     // Comprobamos que ninguno de los campos del formulario haya quedado sin rellenar
-    let formulario = queryAncestorSelector(event.target, "div.formulario");
+    var formulario = queryAncestorSelector(event.target, "div.formulario");
 
     let enunciado = formulario.querySelector("input[type='text']");
     let respuestaVerdadero = formulario.querySelector("input[value='verdadero']");
@@ -331,33 +331,72 @@ function addPregunta(event){
         window.alert("Error al añadir la pregunta: Todos los campos deben ser rellenados.");
     }
     else {
-        
-        // Generamos el HTML correspondiente a una bloque de pregunta
-        let nuevoBloque = document.createElement("div");
-        nuevoBloque.className = "bloque";
-        nuevoBloque.setAttribute("data-identificadorbd", ""); // Atributo para guardar el id de la pregunta en la BD
 
-        let pregunta = document.createElement("div");
-        pregunta.className = "pregunta";
-        pregunta.innerHTML = enunciado.value;
-        insertAsLastChild(nuevoBloque, pregunta);
+        var respuestaCorrecta;
 
-        let respuesta = document.createElement("div");
-        respuesta.className = "respuesta";
-        
-        if(respuestaVerdadero.checked){
-            respuesta.setAttribute("data-valor", "true");
+        if (respuestaVerdadero.checked == true) {
+            respuestaCorrecta = "Verdadero";
+        } else if (respuestaFalso.checked == true){
+            respuestaCorrecta = "Falso";
         }
-        else{
-            respuesta.setAttribute("data-valor", "false");
-        }
-
-        insertAsLastChild(nuevoBloque, respuesta);
-
-        addCruz(nuevoBloque); // Añadimos el icono de borrado
         
-        let cuestionario = queryAncestorSelector(event.target, "section"); // Nos guardamos una referencia al cuestionario actual
-        insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la nueva pregunta a dicho cuestionario
+        let section = queryAncestorSelector(formulario, "section");
+        let tema = section.id;
+
+        event.preventDefault(); // Prevenimos la recarga de la página
+        const url= `${base}/${tema}/pregunta`;
+        const payload= {
+            textoPregunta:enunciado.value,
+            respuestaCorrecta:respuestaCorrecta,
+        };
+        const request = {
+            method: 'POST', 
+            headers: cabeceras,
+            body: JSON.stringify(payload),
+        };
+        fetch(url,request)
+        .then( response => response.json() )
+        .then( r => {
+
+            if (r.error != null){
+                throw new Error("Error al crear la pregunta cuyo tema es " + tema + ":" + r.error);
+            }
+
+            if (r.result){
+
+                // Generamos el HTML correspondiente a una bloque de pregunta
+                let nuevoBloque = document.createElement("div");
+                nuevoBloque.className = "bloque";
+                nuevoBloque.setAttribute("data-identificadorbd", r.result.preguntaId); // Atributo para guardar el id de la pregunta en la BD
+
+                let pregunta = document.createElement("div");
+                pregunta.className = "pregunta";
+                let enunciado = formulario.querySelector("input[type='text']");
+                console.log(enunciado.value);
+                pregunta.innerHTML = enunciado.value;
+                insertAsLastChild(nuevoBloque, pregunta);
+
+                let respuesta = document.createElement("div");
+                respuesta.className = "respuesta";
+                
+                if(respuestaVerdadero.checked){
+                    respuesta.setAttribute("data-valor", "true");
+                }
+                else{
+                    respuesta.setAttribute("data-valor", "false");
+                }
+
+                insertAsLastChild(nuevoBloque, respuesta);
+
+                addCruz(nuevoBloque); // Añadimos el icono de borrado
+                
+                let cuestionario = queryAncestorSelector(event.target, "section"); // Nos guardamos una referencia al cuestionario actual
+                insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la nueva pregunta a dicho cuestionario
+
+            }
+
+        })
+        .catch( error => window.alert(error) );
 
     }
 
@@ -439,7 +478,7 @@ function addCuestionario(event) {
                 insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main del html
             }
         })
-        .catch( (error) => alert(error) );
+        .catch( (error) => window.alert(error) );
 
         // Reseteamos los campos del formulario de adición de cuestionarios
         tema.value = null;
@@ -497,7 +536,7 @@ function init() {
             }
         }
     })
-    .catch( error => alert(error) );
+    .catch( error => window.alert(error) );
 
 
     // Nos guardamos las referencias de cada campo del formulario de creación de cuestionarios

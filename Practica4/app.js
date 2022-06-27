@@ -84,9 +84,10 @@ async function existeCuestionario(temaCuestionario) {
   return r.length>0;
 }
 
-async function existePregunta(temaCuestionario) {
-  let r= await knex('preguntas').select('temaId')
-                                .where('temaId',temaCuestionario);
+async function existePregunta(tema, textoPregunta) {
+  let r = await knex('preguntas').select('*')
+                                .where('textoPregunta',textoPregunta)
+                                .andWhere('temaId', tema);
 
   return r.length>0;
 }
@@ -132,11 +133,11 @@ app.post(config.app.base+'/creacuestionario/:tema', async (req,res) => {
   try {
 
     // Empezamos comprobando que no se haya alcanzado el máximo de cuestionarios en la BD
-    let n= await numeroCuestionarios();
+    /*let n= await numeroCuestionarios();
     if (n>=config.app.maxCuestionarios) {
         res.status(404).send({ result:null,error:'No caben más cuestionarios; contacta con el administrador' });
         return;
-    }
+    }*/
 
     // Comprobamos si ya existe un cuestionario con el mismo tema
     let yaExiste = false;
@@ -164,35 +165,50 @@ app.post(config.app.base+'/creacuestionario/:tema', async (req,res) => {
 });
 
 
-// crea un nuevo item:
-app.post(config.app.base+'/:carrito/productos', async (req, res) => {
-  if (!req.body.item || !req.body.cantidad || !req.body.precio) {
-    res.status(404).send({ result:null,error:'datos mal formados' });
+// Añadir una pregunta y su correspondiente respuesta a un cuestionario dado el id del tema (POST) y devolver el id de la pregunta en la base de datos
+app.post(config.app.base+'/:tema/pregunta', async (req, res) => {
+  
+  // Comprobamos que en el body vengan el id de la pregunta, el texto de la pregunta y la respuesta correcta
+  if (!req.body.textoPregunta || !req.body.respuestaCorrecta) {
+    res.status(404).send({ result:null,error:'datos mal formados para crear la pregunta' });
     return;
   }
+
   try {
-    let existe= await existeCarrito(req.params.carrito);
+
+    // Comprobamos que exista el cuestionario indicado dado el tema pasado por parámetro
+    let existe = await existeCuestionario(req.params.tema);
     if (!existe) {
       res.status(404).send({ result:null,error:`carrito ${req.params.carrito} no existente` });
       return;  
     }
-    existe= await existeItem(req.body.item,req.params.carrito);
+
+    // Comprobamos si ya existe una pregunta con el mismo texto
+    existe= await existePregunta(req.params.tema, req.body.textoPregunta);
     if (existe) {
-      res.status(404).send({ result:null,error:`item ${req.body.item} ya existente` });
+      res.status(404).send({ result:null,error:`pregunta sobre el tema ${req.params.tema} y con el texto pasado ya existente` });
       return;
     }
-    let n= await numeroItems(req.params.carrito);
+
+    // Comprobamos que no se haya excedido el número máximo de preguntas en la BD
+    /*let n= await numeroPreguntas(req.params.carrito);
     if (n>=config.app.maxProductos) {
       res.status(404).send({ result:null,error:`No caben más productos en el carrito ${req.params.carrito}` });
       return;
-    }
-    var i= { carrito:req.params.carrito,item:req.body.item,cantidad:req.body.cantidad,precio:req.body.precio };
-    await knex('productos').insert(i); // AQUÍ ESTÁ EL FALLO
-    res.status(200).send({ result:'ok',error:null });
+    }*/
+
+    var preguntaId = Math.random().toString(36).substring(7); // Generamos un id aleatorio para la pregunta
+
+    var pregunta = { preguntaId:preguntaId,temaId:req.params.tema,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta };
+    await knex('preguntas').insert(pregunta);
+
+    res.status(200).send({ result:{preguntaId:preguntaId},error:null });
+
   } catch (error) {
-    console.log(`No se puede añadir el item: ${error}`);
-    res.status(404).send({ result:null,error:'no se pudo añadir el item' });
+    console.log(`No se puede añadir la pregunta: ${error}`);
+    res.status(404).send({ result:null,error:'no se pudo añadir la pregunta' });
   }
+
 });
 
 

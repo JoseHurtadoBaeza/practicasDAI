@@ -377,7 +377,7 @@ function addPregunta(event){
         .then( r => {
 
             if (r.error != null){
-                throw new Error("Error al crear la pregunta para el cuestionario con id " + cuestionarioId + ":" + r.error);
+                throw new Error("Error al crear la pregunta para el cuestionario con id " + cuestionarioId + ": " + r.error);
             }
 
             if (r.result){
@@ -434,7 +434,7 @@ function insertaCuestionario(cuestionario){
     // Creamos una nueva entrada en el índice
     let elementoLista = document.createElement("li");
     let enlace = document.createElement("a");
-    enlace.href = "#" + cuestionario.getAttribute("data-identificadorbd");
+    enlace.href = "#" + cuestionario.id;
     enlace.textContent = cuestionario.id;
     insertAsLastChild(elementoLista, enlace);
 

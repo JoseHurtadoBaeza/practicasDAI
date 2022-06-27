@@ -9,3 +9,22 @@ Y es que no se exactamente a lo que se refiere con lo de definir una función qu
 Le mando una captura de cómo tengo implementado uno de mis fetch en el cliente para que me diga si voy bien encaminado o tengo que modificar algunas cosas.
 
 Un saludo.
+
+Dudas sobre el enunciado:
+
+- Una situación típica de error que has de controlar es que los parámetros esperados de cada servicio web sean incorrectos o no existan.
+- además, todas tus peticiones Fetch definirán una función que muestre una ventana de alerta similar ante el resto de posibles situaciones de error (por ejemplo, no se puede establecer la conexión con el servidor).
+- En esta práctica crearás servicios web siguiendo el patrón REST para lo siguiente:
+
+añadir un tema de cuestionario (POST) y devolver el id asignado en la base de datos;
+
+recuperar todos los temas (GET);
+
+borrar un tema a partir de su id y todas sus preguntas (DELETE);
+
+añadir una pregunta y su correspondiente respuesta a un cuestionario dado el id del tema (POST) y devolver el id de la pregunta en la base de datos;
+
+obtener todas las preguntas y respuestas dado el id del tema (GET);
+
+borrar una pregunta dado su id (DELETE).
+

@@ -148,10 +148,7 @@ app.post(config.app.base+'/creacuestionario/:tema', async (req,res) => {
 
     // Comprobamos si ya existe un cuestionario con el mismo tema
     let yaExiste = false;
-    //while (!yaExiste) {
-      //var nuevo = Math.random().toString(36).substring(7);
     yaExiste = await existeCuestionario(req.params.tema);
-    //}
     if (yaExiste) {
         res.status(404).send({ result:null, error:`Ya existe un cuestionario cuyo tema es ${req.params.tema}` });
         return;
@@ -173,7 +170,7 @@ app.post(config.app.base+'/creacuestionario/:tema', async (req,res) => {
 
 
 // Añadir una pregunta y su correspondiente respuesta a un cuestionario dado el id del tema (POST) y devolver el id de la pregunta en la base de datos
-app.post(config.app.base+'/:tema/pregunta', async (req, res) => {
+app.post(config.app.base+'/:temaId/pregunta', async (req, res) => {
   
   // Comprobamos que en el body vengan el id de la pregunta, el texto de la pregunta y la respuesta correcta
   if (!req.body.textoPregunta || !req.body.respuestaCorrecta) {
@@ -184,16 +181,16 @@ app.post(config.app.base+'/:tema/pregunta', async (req, res) => {
   try {
 
     // Comprobamos que exista el cuestionario indicado dado el tema pasado por parámetro
-    let existe = await existeCuestionario(req.params.tema);
+    let existe = await existeCuestionario(req.params.temaId);
     if (!existe) {
-      res.status(404).send({ result:null,error:`carrito ${req.params.carrito} no existente` });
+      res.status(404).send({ result:null,error:`carrito ${req.params.temaId} no existente` });
       return;  
     }
 
-    // Comprobamos si ya existe una pregunta con el mismo texto
-    existe= await existePregunta(req.params.tema, req.body.textoPregunta);
+    // Comprobamos si ya existe una pregunta con el mismo enunciado
+    existe= await existePregunta(req.params.temaId, req.body.textoPregunta);
     if (existe) {
-      res.status(404).send({ result:null,error:`pregunta sobre el tema ${req.params.tema} y con el enunciado pasado ya existente` });
+      res.status(404).send({ result:null,error:`ya existe una pregunta en el cuestionario con id ${req.params.temaId} con el mismo enunciado` });
       return;
     }
 
@@ -206,7 +203,7 @@ app.post(config.app.base+'/:tema/pregunta', async (req, res) => {
 
     var preguntaId = Math.random().toString(36).substring(7); // Generamos un id aleatorio para la pregunta
 
-    var pregunta = { preguntaId:preguntaId,temaId:req.params.tema,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta };
+    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta };
     await knex('preguntas').insert(pregunta);
 
     res.status(200).send({ result:{preguntaId:preguntaId},error:null });
@@ -296,7 +293,7 @@ app.delete(config.app.base+'/:cuestionarioId', async (req, res) => {
 
   try {
 
-    // Comprobamos si existe un cuestionario del tema indicado
+    // Comprobamos si existe un cuestionario con el id indicado
     let existe = await existeCuestionario(req.params.cuestionarioId);
     if (!existe) {
       res.status(404).send({ result:null,error:`No existe ningún cuestionario con id ${req.params.cuestionarioId}` });

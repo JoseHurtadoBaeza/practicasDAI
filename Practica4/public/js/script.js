@@ -109,67 +109,63 @@ function borraPregunta(event) {
 
         removeElement(bloquePregunta); // Borramos el bloque con la pregunta
 
-    })
-    .catch( error => window.alert(error) );
-
-    // Si no quedan preguntas en el cuestionario lo borramos así como su enlace y la descripción
-    if(cuestionario.querySelector(".bloque") == null){
+        // Si no quedan preguntas en el cuestionario lo borramos así como su enlace y la descripción
+        if(cuestionario.querySelector(".bloque") == null){
         
-        let eliminado = false;
-        let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
+            let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
 
-        event.preventDefault(); // Evitamos la recarga de la página
-        const url= `${base}/${cuestionarioId}`;
-        const payload= {};
-        var request = {
-            method: 'DELETE', 
-            headers: cabeceras,
-            body: JSON.stringify(payload),
-        };
-        fetch(url,request)
-        /*.then( response => {
-            if (!response.ok){
-                throw new Error("No se ha podido establecer la conexión con el servidor")
-            }
-            response.json() 
-        })*/
-        .then( response => response.json())
-        .then( r  => {
-            if (r.error != null) {
-                throw new Error("Error al borrar el cuestionario cuyo tema es " + cuestionarioId + ":" + r.error);
-            }
-            eliminado = true;
-        })
-        .catch( (error) => window.alert(error) );
+            event.preventDefault(); // Evitamos la recarga de la página
+            const url= `${base}/${cuestionarioId}`;
+            const payload= {};
+            var request = {
+                method: 'DELETE', 
+                headers: cabeceras,
+                body: JSON.stringify(payload),
+            };
+            fetch(url,request)
+            /*.then( response => {
+                if (!response.ok){
+                    throw new Error("No se ha podido establecer la conexión con el servidor")
+                }
+                response.json() 
+            })*/
+            .then( response => response.json())
+            .then( r  => {
+                
+                if (r.error != null) {
+                    throw new Error("Error al borrar el cuestionario cuyo tema es " + cuestionarioId + ":" + r.error);
+                }
 
-        // Si el cuestionario se ha borrado correctamente en la BD
-        if (eliminado){
+                // Nos guardamos todos los enlaces actuales
+                let links = document.querySelectorAll("header nav ul a");
 
-            // Nos guardamos todos los enlaces actuales
-            let links = document.querySelectorAll("header nav ul a");
+                // Nos guardamos el selector para la comparación
+                let href = "#" + cuestionario.getAttribute("id");
 
-            // Nos guardamos el selector para la comparación
-            let href = "#" + cuestionario.getAttribute("id");
+                let encontrado = false;
 
-            let encontrado = false;
+                // Buscamos el enlace que case con el hrefs
+                for (let i = 0; i < links.length && !encontrado; i++){
 
-            // Buscamos el enlace que case con el href
-            for (let i = 0; i < links.length && !encontrado; i++){
+                    if(links[i].getAttribute("href") == href){
 
-                if(links[i].getAttribute("href") == href){
+                        removeElement(queryAncestorSelector(links[i], "li")); // Borramos el elemento li de la lista que contiene el enlace
+                        encontrado = true;
 
-                    removeElement(queryAncestorSelector(links[i], "li")); // Borramos el elemento li de la lista que contiene el enlace
-                    encontrado = true;
+                    }
 
                 }
 
-            }
+                removeElement(cuestionario); // Elmininamos el cuestionario
+            
+            })
+            .catch( (error) => window.alert(error) );
 
-            removeElement(cuestionario); // Elmininamos el cuestionario
 
         }
 
-    }
+    })
+    .catch( error => window.alert(error) );
 
 } 
 
@@ -551,8 +547,62 @@ function init() {
                 let cuestionario = document.createElement("section");
                 cuestionario.id = r.result[i].tema; // Le añadimos el id
                 cuestionario.setAttribute("data-identificadorbd", r.result[i].cuestionarioId);
+                let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
 
                 insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main
+
+                // Insertamos las preguntas almacenadas en la BD de dicho cuestionario
+                const url= `${base}/preguntas/${cuestionarioId}`;
+                const request = {
+                    method: 'GET', 
+                    headers: cabeceras,
+                };
+                fetch(url, request)
+                .then( response => response.json())
+                .then( r => {
+
+                    if (r.error != null){
+                        throw new Error("Error al obtener las preguntas de la BD: " + r.error)
+                    }
+
+                    if (r.result){
+                        
+                        for(var j=0;j<r.result.length;j++) {
+
+                            // Generamos el HTML correspondiente a una bloque de pregunta
+                            let nuevoBloque = document.createElement("div");
+                            nuevoBloque.className = "bloque";
+                            nuevoBloque.setAttribute("data-identificadorbd", r.result[j].preguntaId); // Atributo para guardar el id de la pregunta en la BD
+
+                            let pregunta = document.createElement("div");
+                            pregunta.className = "pregunta";
+                            pregunta.innerHTML = r.result[j].textoPregunta; // Obtenemos el valor del payload, porque no podemos acceder al valor de las variables externas
+                            insertAsLastChild(nuevoBloque, pregunta);
+
+                            let respuesta = document.createElement("div");
+                            respuesta.className = "respuesta";
+                            
+                            // No podemos consultar los valores de las variables externas, así que consultamos el payload
+                            if(r.result[j].respuestaCorrecta == "Verdadero"){
+                                respuesta.setAttribute("data-valor", "true");
+                            }
+                            else if(r.result[j].respuestaCorrecta == "Falso"){
+                                respuesta.setAttribute("data-valor", "false");
+                            }
+
+                            insertAsLastChild(nuevoBloque, respuesta);
+
+                            addCruz(nuevoBloque); // Añadimos el icono de borrado
+                            
+                            insertAsLastChild(cuestionario, nuevoBloque); // Añadimos cada pregunta perteneciente al cuestionario
+
+                        }
+
+                    }
+
+                })
+                .catch( error => window.alert(error) );
+
 
             }
         }

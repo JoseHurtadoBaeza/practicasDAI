@@ -72,9 +72,9 @@ async function numeroCuestionarios() {
   return n[0]['n'];
 }
 
-async function numeroPreguntas(temaCuestionario) {
+async function numeroPreguntas(cuestionarioId) {
   let r= await knex('preguntas').select('preguntaId')
-                                .where('temaId',temaCuestionario);
+                                .where('temaId',cuestionarioId);
   return r.length;
 }
 
@@ -240,55 +240,30 @@ app.get(config.app.base+'/cuestionarios', async (req, res) => {
 });
 
 
-// lista los datos de un item:
-app.get(config.app.base+'/:carrito/productos/:item', async (req, res) => {
+// Obtener todas las preguntas y respuestas dado el id del tema (GET)
+app.get(config.app.base+'/preguntas/:cuestionarioId', async (req, res) => {
+
   try {
-    let existe= await existeCarrito(req.params.carrito);
+    // Empezamos comprobando que exista el cuestionario
+    let existe= await existeCuestionario(req.params.cuestionarioId);
     if (!existe) {
-      res.status(404).send({ result:null,error:`carrito ${req.params.carrito} no existente` });
+      res.status(404).send({ result:null,error:`cuestionario ${req.params.cuestionarioId} no existente` });
       return;  
     }
-    existe= await existeItem(req.params.item,req.params.carrito);
-    if (!existe) {
-      res.status(404).send({ result:null,error:`item ${req.params.item} no existente` });
-      return;
-    }
-    let i= await knex('productos').select(['item','cantidad','precio'])
-                                  .where('carrito',req.params.carrito)
-                                  .andWhere('item',req.params.item);
-    res.status(200).send({ result:i[0],error:null });
-  } catch (error) {
-    console.log(`No se pudo obtener el item: ${error}`);
-    res.status(404).send({ result:null,error:'no se pudo obtener el item' });
-  }
-});
 
-
-// modifica un item:
-app.put(config.app.base+'/:carrito/productos/:item', async (req, res) => {
-  if (!req.body.cantidad || !req.body.precio) {
-    res.status(404).send({ result:null,error:'datos mal formados' });
-    return;
-  }
-  try {
-    let existe= await existeCarrito(req.params.carrito);
+    // Comprobamos que el cuestionario no esté vacío
+    /*existe= await existeItem(req.params.item,req.params.carrito);
     if (!existe) {
-      res.status(404).send({ result:null,error:`carrito ${req.params.carrito} no existente` });
-      return;  
-    }
-    existe= await existeItem(req.params.item,req.params.carrito);
-    if (!existe) {
-      res.status(404).send({ result:null,error:`item ${req.params.item} no existente` });
+      res.status(404).send({ result:null,error:`no hay preguntas en el cuestionario ${req.params.cuestionarioId}` });
       return;
-    }
-    await knex('productos').update('cantidad',req.body.cantidad)
-                           .where('carrito',req.params.carrito)
-                           .andWhere('item',req.params.item)
-                           .andWhere('precio',req.params.precio);
-    res.status(200).send({ result:'ok',error:null });
+    }*/
+
+    let preguntasYrespuestas = await knex('preguntas').select(['preguntaId','textoPregunta','respuestaCorrecta'])
+                                  .where('temaId',req.params.cuestionarioId);
+    res.status(200).send({ result:preguntasYrespuestas,error:null });
   } catch (error) {
-    console.log(`No se pudo obtener el item: ${error}`);
-    res.status(404).send({ result:null,error:'no se pudo obtener el item' });
+    console.log(`No se pudieron obtener las preguntas: ${error}`);
+    res.status(404).send({ result:null,error:'no se pudieron obtener las preguntas' });
   }
 });
 
@@ -322,7 +297,7 @@ app.delete(config.app.base+'/:cuestionarioId', async (req, res) => {
   try {
 
     // Comprobamos si existe un cuestionario del tema indicado
-    let existe= await existeCuestionario(req.params.cuestionarioId);
+    let existe = await existeCuestionario(req.params.cuestionarioId);
     if (!existe) {
       res.status(404).send({ result:null,error:`No existe ningún cuestionario con id ${req.params.cuestionarioId}` });
       return;  
@@ -343,7 +318,7 @@ app.delete(config.app.base+'/:cuestionarioId', async (req, res) => {
 
 
 // borra toda la base de datos:
-app.get(config.app.base+'/clear', async (req,res) => {
+/*app.get(config.app.base+'/clear', async (req,res) => {
   try {
     await knex('productos').where('carrito',req.params.carrito)
                            .del();
@@ -353,7 +328,7 @@ app.get(config.app.base+'/clear', async (req,res) => {
   } catch (error) {
     console.log(`No se pudo borrar la base de datos: ${error}`);
   }
-});
+});*/
 
 
 const path = require('path');

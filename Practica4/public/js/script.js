@@ -371,9 +371,7 @@ function addPregunta(event){
 
                 let pregunta = document.createElement("div");
                 pregunta.className = "pregunta";
-                let enunciado = formulario.querySelector("input[type='text']");
-                console.log(enunciado.value);
-                pregunta.innerHTML = enunciado.value;
+                pregunta.innerHTML = payload.textoPregunta;
                 insertAsLastChild(nuevoBloque, pregunta);
 
                 let respuesta = document.createElement("div");

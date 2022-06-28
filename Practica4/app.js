@@ -188,9 +188,9 @@ app.post(config.app.base+'/:temaId/pregunta', async (req, res) => {
   try {
 
     // Comprobamos que exista el cuestionario indicado dado el tema pasado por parámetro
-    let existe = await existeCuestionario(req.params.temaId);
+    let existe = await existeCuestionarioPorId(req.params.temaId);
     if (!existe) {
-      res.status(404).send({ result:null,error:`carrito ${req.params.temaId} no existente` });
+      res.status(404).send({ result:null,error:`cuestionario con id ${req.params.temaId} no existente` });
       return;  
     }
 
@@ -301,7 +301,7 @@ app.delete(config.app.base+'/:cuestionarioId', async (req, res) => {
   try {
 
     // Comprobamos si existe un cuestionario con el id indicado
-    let existe = await existeCuestionario(req.params.cuestionarioId);
+    let existe = await existeCuestionarioPorId(req.params.cuestionarioId);
     if (!existe) {
       res.status(404).send({ result:null,error:`No existe ningún cuestionario con id ${req.params.cuestionarioId}` });
       return;  

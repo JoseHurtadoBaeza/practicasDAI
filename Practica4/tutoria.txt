@@ -1,5 +1,9 @@
-Por otro lado, tengo una duda respecto a la parte del enunciado donde se nos dice lo siguiente -> "todas tus peticiones Fetch definirán una función que muestre una ventana de alerta similar ante el resto de posibles situaciones de error (por ejemplo, no se puede establecer la conexión con el servidor)".
-Y es que no se exactamente a lo que se refiere con lo de definir una función que muestre una ventana de alerta similar, es decir, no puedo usar sin más la función alert, sino que tengo que implementar una función anónima?? O es que tenemos que usar async y await para realizar nuestros fetch de la parte cliente y así poder gestionar mejor los distintos errores que puedan surgir??
+Por otro lado, tengo una duda respecto a la parte del enunciado donde se nos dice lo siguiente:
+"todas tus peticiones Fetch definirán una función que muestre una ventana de alerta similar ante el resto de posibles situaciones de error 
+(por ejemplo, no se puede establecer la conexión con el servidor)".
+Y es que no se exactamente a lo que se refiere con lo de definir una función que muestre una ventana de alerta similar, es decir, 
+no puedo usar sin más la función alert, 
+sino que tengo que implementar una función anónima??
 
 Dudas sobre el enunciado:
 
@@ -8,3 +12,6 @@ Dudas sobre el enunciado:
 - además, todas tus peticiones Fetch definirán una función que muestre una ventana de alerta similar ante el resto de posibles situaciones de error (por ejemplo, no se puede establecer la conexión con el servidor).
 
 Unchecked runtime.lastError: The message port closed before a response was received. localhost/:1 
+
+
+Los errores en la consola al hacer por ejemplo un post??

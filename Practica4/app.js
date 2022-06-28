@@ -47,7 +47,7 @@ async function creaEsquema(res) {
     if (!existeTabla) {
       await knex.schema.createTable('preguntas', (table) => {
         table.string('preguntaId').primary();
-        //table.string('temaId', 100).unsigned().notNullable(); // AQUÍ ESTARÍA EL POSIBLE ERROR
+        //table.string('temaId', 100).unsigned().notNullable(); // AQUÍ ESTABA UN ERROR AL DESPLEGAR EN LA NUBE
         table.integer('temaId').notNullable();
         table.string('textoPregunta', 100).notNullable();
         table.integer('respuestaCorrecta').notNullable(); // Verdadero/True es 1 y Falso/False es 0
@@ -79,9 +79,9 @@ async function numeroPreguntas(cuestionarioId) {
   return r.length;
 }
 
-async function existeCuestionario(cuestionarioId) {
-  let r= await knex('cuestionarios').select('cuestionarioId')
-                                    .where('cuestionarioId',cuestionarioId);
+async function existeCuestionario(tema) {
+  let r= await knex('cuestionarios').select('*')
+                                    .where('tema',tema);
   return r.length>0;
 }
 
@@ -148,15 +148,14 @@ app.post(config.app.base+'/creacuestionario/:tema', async (req,res) => {
     }*/
 
     // Comprobamos si ya existe un cuestionario con el mismo tema
-    let yaExiste = false;
-    yaExiste = await existeCuestionario(req.params.tema);
+    let yaExiste = await existeCuestionario(req.params.tema);
     if (yaExiste) {
         res.status(404).send({ result:null, error:`Ya existe un cuestionario cuyo tema es ${req.params.tema}` });
         return;
     }
 
-    var cuestionario = { tema:req.params.tema }; // Creamos un objeto de tipo cuestionario
-    await knex('cuestionarios').insert(cuestionario); // Lo insertamos en la BD
+    var cuestionario = { tema:req.params.tema }; // Creamos un objeto de ntipo cuestionario
+    await knex('cuestionarios').insert(cuestionario); // Lo insertamos e la BD
 
     // Obtenemos el id del cuestionario recién creado
     let idNuevoCuestionario = await getIdCuestionario(req.params.tema);

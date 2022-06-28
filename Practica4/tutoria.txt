@@ -1,12 +1,5 @@
-He realizado el despliegue en google app engine y me ha dado error al crear la tabla.
-
-La primera de ellas es respecto a este servicio web -> "recuperar todos los temas (GET);"
-A mi entender, tengo que devolver todos los cuestionarios de la bd, es decir, cada cuestionario con su identificador y su tema, no únicamente el tema de cada cuestionario. Corríjame si me equivoco.
-
 Por otro lado, tengo una duda respecto a la parte del enunciado donde se nos dice lo siguiente -> "todas tus peticiones Fetch definirán una función que muestre una ventana de alerta similar ante el resto de posibles situaciones de error (por ejemplo, no se puede establecer la conexión con el servidor)".
 Y es que no se exactamente a lo que se refiere con lo de definir una función que muestre una ventana de alerta similar, es decir, no puedo usar sin más la función alert, sino que tengo que implementar una función anónima?? O es que tenemos que usar async y await para realizar nuestros fetch de la parte cliente y así poder gestionar mejor los distintos errores que puedan surgir??
-
-Le mando una captura de cómo tengo implementado uno de mis fetch en el cliente para que me diga si voy bien encaminado o tengo que modificar algunas cosas.
 
 Dudas sobre el enunciado:
 
@@ -14,38 +7,4 @@ Dudas sobre el enunciado:
 
 - además, todas tus peticiones Fetch definirán una función que muestre una ventana de alerta similar ante el resto de posibles situaciones de error (por ejemplo, no se puede establecer la conexión con el servidor).
 
-- En esta práctica crearás servicios web siguiendo el patrón REST para lo siguiente:
-
-añadir un tema de cuestionario (POST) y devolver el id asignado en la base de datos;
-recuperar todos los temas (GET);
-borrar un tema a partir de su id y todas sus preguntas (DELETE);
-añadir una pregunta y su correspondiente respuesta a un cuestionario dado el id del tema (POST) y devolver el id de la pregunta en la base de datos;
-obtener todas las preguntas y respuestas dado el id del tema (GET);
-borrar una pregunta dado su id (DELETE).
-
-Preguntar por la hora del examen de prácticas y un poco cómo prepararlo o encararlo.
-
-- Respecto a los temas de los cuestionarios. ¿Hay que controlar las mayúsculas y minúsculas?
-
-- Respecto a la validación de los documentos en cada punto de la ejecución. ¿Hay algún problema si salta un warning?
-
-- En cuanto a la versión de node, actualmente el proyecto se despliega con la versión 12. ¿Debería modificar esto?
-Lo digo más que nada por esto -> WARNING: Node.js 12 is no longer supported by the Node.js Foundation as of April 2022. 
-We recommend you to upgrade to the latest version of Node.js runtime as soon as possible. 
-For details on upgrading, see https://cloud.google.com/appengine/docs/standard/nodejs/runtime.
-
-- En lo referente a la configuración config.app, he modificado el endpoint base de la aplicación, pero la cuestión es; ¿Realmente esto importa? 
-Y por otro lado, en dicho fichero estan las variables que determinan el máximo de cuestionarios y preguntas permitidos en la BD, y el tema es;
-¿Esto hay que controlarlo desde el código? 
-
-- Y por otra parte, los errores que aparecen en la consola hasta que punto son relevantes, lo menciono porque a veces me saltan estos dos:
-
-Failed to load resource: the server responded with a status of 404 (Not Found) :5000/favicon.ico:1 
 Unchecked runtime.lastError: The message port closed before a response was received. localhost/:1 
-
-- ¿En esta práctica hay que codificar algo respecto a las cabeceras CORS?
-
-- Me he dado cuenta de que si borro el fichero de la BD durante la ejecución y recargo la página se sigue mostrando los cuestionarios y preguntas creadas antes del borrado, 
-y si recargo la aplicación con npm start entonces ya sí se muestra la aplicación en su versión inicial.
-
-- Sobre la clave ajena. ¿Es necesario definir la clave ajena explícitamente?

@@ -85,6 +85,13 @@ async function existeCuestionario(tema) {
   return r.length>0;
 }
 
+async function existeCuestionarioPorId(cuestionarioId) {
+  let r= await knex('cuestionarios').select('*')
+                                    .where('cuestionarioId',cuestionarioId);
+  return r.length>0;
+}
+
+
 async function existePregunta(tema, textoPregunta) {
   let r = await knex('preguntas').select('*')
                                 .where('textoPregunta',textoPregunta)
@@ -242,7 +249,7 @@ app.get(config.app.base+'/preguntas/:cuestionarioId', async (req, res) => {
 
   try {
     // Empezamos comprobando que exista el cuestionario
-    let existe= await existeCuestionario(req.params.cuestionarioId);
+    let existe= await existeCuestionarioPorId(req.params.cuestionarioId);
     if (!existe) {
       res.status(404).send({ result:null,error:`cuestionario ${req.params.cuestionarioId} no existente` });
       return;  

@@ -47,7 +47,8 @@ async function creaEsquema(res) {
     if (!existeTabla) {
       await knex.schema.createTable('preguntas', (table) => {
         table.string('preguntaId').primary();
-        table.string('temaId', 100).unsigned().notNullable();
+        //table.string('temaId', 100).unsigned().notNullable(); // AQUÍ ESTARÍA EL POSIBLE ERROR
+        table.integer('temaId').notNullable();
         table.string('textoPregunta', 100).notNullable();
         table.integer('respuestaCorrecta').notNullable(); // Verdadero/True es 1 y Falso/False es 0
 

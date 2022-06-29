@@ -1,5 +1,5 @@
 {
-  "name": "Un carrito de la compra escrito con Node.js",
+  "name": "Cuestionarios con preguntas codificados con Node.js",
   "env": {
     "CARRITO_ENV": "heroku"
   },

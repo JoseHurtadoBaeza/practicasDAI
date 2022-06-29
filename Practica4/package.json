@@ -1,8 +1,8 @@
 {
-  "name": "carrito",
+  "name": "cuestionarios",
   "version": "0.1.0",
   "engines": {
-    "node": "12.x"
+    "node": "16.x"
   },
   "scripts": {
     "start": "node app.js"

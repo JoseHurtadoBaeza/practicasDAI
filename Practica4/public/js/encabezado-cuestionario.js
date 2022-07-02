@@ -38,17 +38,17 @@
         static get observedAttributes() { return ['data-tema'] } // Indicamos los atributos que vamos a controlar su cambio
 
         constructor() {
-            super();
-            let clone = template.content.cloneNode(true);
-            let shadowRoot = this.attachShadow({
+            super(); // Llamamos al constructor de la clase padre
+            let clone = template.content.cloneNode(true); // Clonamos la plantilla
+            let shadowRoot = this.attachShadow({ // Creamos un nodo ensombrecido vinculado a la instancia del elemento
                 mode: 'open'
             });
-            shadowRoot.appendChild(clone);
+            shadowRoot.appendChild(clone); // Añadimos el nodo clonado al nodo ensombrecido del elemento
         }
 
         attributeChangedCallback(name, oldValue, newValue) {
             
-            var componente = this; // // Aquí this apunta al shadow host del componente web (clausura)
+            var componente = this; // Aquí this apunta al shadow host del componente web (clausura)
             if (name === 'data-tema'){
                 this.tema = this.hasAttribute('data-tema')?newValue:oldValue;
             }

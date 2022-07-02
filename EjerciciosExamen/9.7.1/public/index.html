@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Práctica 4 - Una aplicación en la nube</title>
+
+    <!-- Insertamos el tipo de letra Droid Serif para la vista normal-->
+    <link href='https://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'>
+
+    <!-- Hacemos que la vista normal sea la que se muestra por defecto-->
+    <link id="estilo" rel="stylesheet" type="text/css" href="./css/normal.css">
+
+    <!-- Adjuntamos el código del componente web creado -->
+    <script defer src="./js/encabezado-cuestionario.js"></script>
+
+</head>
+<body>
+
+    <header>
+
+        <h1>qÜestiona</h1>
+        <p>qÜestiona es una aplicación web que permite gestionar cuestionarios sobre un determinado tema en el que las posibles respuestas son
+        verdadero o falso. La aplicación se desarrolla como parte de las prácticas de la asignatura Desarrollo de Aplicaciones en Internet del Grado
+        en Ingeniería Informática de la Universitat d'Alacant.</p>
+
+        <nav>
+            <ul>
+                <!--<li><a href=#parís>París</a></li>
+                <li><a href=#londres>Londres</a></li>-->
+            </ul>
+        </nav>
+
+    </header>
+    
+    <main>
+
+        <!-- Formulario de creación de cuestionarios -->
+        <div class="formulario" id="nuevoCuestionario">
+            <ul>
+                <li>
+                    <label>Tema del cuestionario:</label>
+                    <input type="text" name="tema" autofocus>
+                </li>
+                <li>
+                    <input type="button" name="crea" value="Crear nuevo cuestionario">
+                </li>
+            </ul>
+        </div>
+
+        <!--<section id="parís">
+
+            <encabezado-cuestionario data-tema="París"></encabezado-cuestionario>
+
+            <div class="bloque">
+                <div class="pregunta">
+                La ciudad de París se sitúa a ambos lados del río Sena.
+                </div>
+                <div class="respuesta" data-valor="true">
+                </div>
+            </div>
+
+            <div class="bloque">
+                <div class="pregunta">
+                La Basílica del Sacré C&#339;ur es la única iglesia de Montmartre.
+                </div>
+                <div class="respuesta" data-valor="false">
+                </div>
+            </div>
+
+            <div class="bloque">
+                <div class="pregunta">
+                París se divide administrativamente en 20 distritos o <span class="idioma">arrondissements.</span>
+                </div>
+                <div class="respuesta" data-valor="true">
+                </div>
+            </div>
+
+        </section>
+
+        <section id="londres">
+
+            <encabezado-cuestionario data-tema="Londres"></encabezado-cuestionario>
+
+            <div class="bloque">
+                <div class="pregunta">
+                Trafalgar Square es uno de los cuatro enclaves declarados 
+                Patrimonio de la Humanidad por la Unesco con los que cuenta Londres.
+                </div>
+                <div class="respuesta" data-valor="false">
+                </div>
+            </div>
+
+            <div class="bloque">
+                <div class="pregunta">
+                El metro de Londres es el más antiguo del mundo.
+                </div>
+                <div class="respuesta" data-valor="true">
+                </div>
+            </div>
+
+        </section>-->
+
+    </main>
+
+    <footer>
+        <span id="nombre">jhb3 | Práctica 4 de Desarollo de Aplicaciones en Internet | Universitat d'Alacant |</span>
+        <span id="tiempo">[26 horas]</span>
+    </footer>
+
+    <!-- Código javascript asociado -->
+    <script src="./js/script.js"></script>
+
+</body>
+</html>

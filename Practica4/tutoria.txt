@@ -1,0 +1,31 @@
+Por otro lado, tengo una duda respecto a la parte del enunciado donde se nos dice lo siguiente:
+"todas tus peticiones Fetch definirán una función que muestre una ventana de alerta similar ante el resto de posibles situaciones de error 
+(por ejemplo, no se puede establecer la conexión con el servidor)".
+Y es que no se exactamente a lo que se refiere con lo de definir una función que muestre una ventana de alerta similar, es decir, 
+no puedo usar sin más la función alert, 
+sino que tengo que implementar una función anónima??
+
+Dudas sobre el enunciado:
+
+- Una situación típica de error que has de controlar es que los parámetros esperados de cada servicio web sean incorrectos o no existan.
+
+- además, todas tus peticiones Fetch definirán una función que muestre una ventana de alerta similar ante el resto de posibles situaciones de error (por ejemplo, no se puede establecer la conexión con el servidor).
+
+Unchecked runtime.lastError: The message port closed before a response was received. localhost/:1 
+
+
+Los errores en la consola al hacer por ejemplo un post??
+
+TUTORÍA:
+Hola de nuevo Juan Antonio, mire es que ayer con tanta pregunta se me olvidó consultarle algunas dudas que posiblemente fueran más relevantes que las que le propuse. 
+
+La primera de ellas es respecto a algunos errores que me salen en la consola de javascript cuando intento hacer peticiones post para crear un cuestionario sobre un tema ya existente y una pregunta con un enunciado ya existente en un cuestionario. Le paso una captura para que me comprenda mejor porque no estoy seguro de si esta situación es correcta o debo controlarla de alguna manera.
+
+La segunda de las dudas es sobre el enunciado, concretamente donde se nos dice que "Una situación típica de error que has de controlar es que los parámetros esperados de cada servicio web sean incorrectos o no existan."
+Esto intuyo que se refiere a que por ejemplo cuando hacemos un post para crear una pregunta en un cuestionario y tenemos que pasar información en el payload que posteriormente interpretamos como body, debemos verificar que los parámetros de dicho body existan.
+
+Por otro lado, tengo una duda respecto a la parte del enunciado donde se nos dice lo siguiente:
+"todas tus peticiones Fetch definirán una función que muestre una ventana de alerta similar ante el resto de posibles situaciones de error 
+(por ejemplo, no se puede establecer la conexión con el servidor)".
+Y es que no se exactamente a lo que se refiere con lo de definir una función que muestre una ventana de alerta similar, es decir, 
+no puedo usar sin más la función window.alert(error),  sino que tengo que implementar una función anónima??

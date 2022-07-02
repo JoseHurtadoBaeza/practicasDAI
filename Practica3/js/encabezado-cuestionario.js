@@ -48,7 +48,7 @@
 
         attributeChangedCallback(name, oldValue, newValue) {
             
-            var componente = this; // // Aquí this apunta al shadow host del componente web (clausura)
+            var componente = this; // Aquí this apunta al shadow host del componente web (clausura)
             if (name === 'data-tema'){
                 this.tema = this.hasAttribute('data-tema')?newValue:oldValue;
             }
@@ -107,13 +107,8 @@
                     .then(function(responseAsObject){
                         
                         let titulo = componente.shadowRoot.querySelector("h2");
-                        titulo.textContent = ""; // Borramos el contenido anterior del titulo para actualizar la información ante un cambio de tema
-                        let imagen = document.createElement('img');
-                        let textoTitulo = document.createTextNode("Cuestionario sobre " + componente.tema);
-                        let src = responseAsObject.sizes.size[0].source; // Nos guardamos la referencia a la imagen con el formato más compacto que es la primera
-                        imagen.setAttribute("src", src);
-                        imagen.setAttribute("alt", "Una imagen representativa de " + componente.tema);
-                        titulo.appendChild(imagen);
+                        titulo.textContent = ""; // Borramos el contenido anterior del titulo para actual         
+            
                         titulo.appendChild(textoTitulo);
             
                     })
@@ -123,10 +118,8 @@
 
                 }
                 else { // Sino
-                    
-                    let titulo = componente.shadowRoot.querySelector("h2");
-                    titulo.textContent = ""; // Borramos el contenido anterior del titulo para actualizar la información ante un cambio de tema
-                    let imagen = document.createElement('img');
+                             
+            
                     let textoTitulo = document.createTextNode("Cuestionario sobre " + componente.tema);
                     let src = "./img/globe_east_540.jpg"; // Nos guardamos la referencia a la imagen de la tierra
                     imagen.setAttribute("src", src);

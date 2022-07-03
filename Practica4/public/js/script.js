@@ -529,11 +529,6 @@ function init() {
         headers: cabeceras,
     };
     fetch(url,request)
-    /*.then( response => 
-        if (!response.ok){
-            throw new Error("No se ha podido establecer la conexión con el servidor")
-        }
-        response.json())*/
     .then( response => response.json())
     .then( r => {
 

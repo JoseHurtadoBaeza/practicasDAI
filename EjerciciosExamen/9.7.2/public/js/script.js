@@ -36,7 +36,7 @@ function addCruz(nodo) {
     let estrella = document.createElement("div");
     estrella.className = "destaca";
     estrella.innerHTML = "&#9733;";
-    insertAsLastChild(nodo, estrella);
+    insertAsFirstChild(nodo, estrella);
     estrella.addEventListener("click", destacaPregunta, false);
 
 }
@@ -130,12 +130,6 @@ function borraPregunta(event) {
                 body: JSON.stringify(payload),
             };
             fetch(url,request)
-            /*.then( response => {
-                if (!response.ok){
-                    throw new Error("No se ha podido establecer la conexión con el servidor")
-                }
-                response.json() 
-            })*/
             .then( response => response.json())
             .then( r  => {
                 
@@ -173,6 +167,95 @@ function borraPregunta(event) {
 
     })
     .catch( error => window.alert(error) );
+
+} 
+
+/* Función que destaca o deja de destacar una pregunta de un cuestionario */
+function destacaPregunta(event) {
+
+    let bloquePregunta = queryAncestorSelector(event.target, ".bloque"); // Referencia a la pregunta
+
+    let cuestionario = queryAncestorSelector(bloquePregunta, "section"); // Referencia al cuestionario
+
+    let preguntaId = bloquePregunta.getAttribute("data-identificadorbd"); // Referencia a la pregunta en la BD
+
+    let preguntasCuestionario = cuestionario.querySelectorAll(".bloque"); // Referencia a la lista de preguntas del cuestionario
+
+    let algunaDestacada = false;
+
+    // Comprobamos si hay alguna pregunta ya destacada en el cuestionario
+    for (let i=0; i<preguntasCuestionario.length && !algunaDestacada; i++){
+
+        // Si hay alguna pregunta destacada que no sea sobre la que se ha hecho click en destacar
+        if (preguntasCuestionario[i].getAttribute("data-destacada") == "true" && preguntasCuestionario[i].getAttribute("data-identificadorbd") != preguntaId) {
+            algunaDestacada = true;
+        }
+
+    }
+
+    if (algunaDestacada) {
+        window.alert("Ya hay una pregunta destacada");
+        return;
+    }
+    
+        let destacada = bloquePregunta.getAttribute("data-destacada");
+    
+        // Si la pregunta está destacada la dejamos de destacar
+        if(destacada == "true"){
+    
+            event.preventDefault(); // Evitamos la recarga de la página
+            const url= `${base}/editarDestacada/${preguntaId}`;
+            const payload= {destacada:"false"};
+            var request = {
+                method: 'PUT', 
+                headers: cabeceras,
+                body: JSON.stringify(payload),
+            };
+            fetch(url,request)
+            .then( response => response.json())
+            .then( r  => {
+                
+                if (r.error != null) {
+                    throw new Error("Error al actualizar el estado de destacada de la pregunta cuyo id es " + preguntaId + ":" + r.error);
+                }
+    
+                // Actualizamos el valor del atributo data-destacada de la pregunta
+                bloquePregunta.setAttribute("data-destacada", "false");
+            
+            })
+            .catch( (error) => window.alert(error) );
+    
+    
+        } else { // Si no está destacada la destacamos
+    
+            
+            event.preventDefault(); // Evitamos la recarga de la página
+            const url= `${base}/editarDestacada/${preguntaId}`;
+            const payload= {destacada:"true"};
+            var request = {
+                method: 'PUT', 
+                headers: cabeceras,
+                body: JSON.stringify(payload),
+            };
+            fetch(url,request)
+            .then( response => response.json())
+            .then( r  => {
+                
+                if (r.error != null) {
+                    throw new Error("Error al actualizar el estado de destacada de la pregunta cuyo id es " + preguntaId + ":" + r.error);
+                }
+    
+                // Actualizamos el valor del atributo data-destacada de la pregunta
+                bloquePregunta.setAttribute("data-destacada", "true");
+
+                // Movemos la pregunta al inicio del cuestionario
+                insertBeforeChild(cuestionario, preguntasCuestionario[0], bloquePregunta);
+                
+            })
+            .catch( (error) => window.alert(error) );
+    
+        }
+
 
 } 
 
@@ -579,7 +662,8 @@ function init() {
 
                             let pregunta = document.createElement("div");
                             pregunta.className = "pregunta";
-                            pregunta.innerHTML = r.result[j].textoPregunta; // Obtenemos el valor del payload, porque no podemos acceder al valor de las variables externas
+                            pregunta.innerHTML = r.result[j].textoPregunta; // Obtenemos el valor del payload, porque no podemos acceder al valor de las variables externas 
+
                             insertAsLastChild(nuevoBloque, pregunta);
 
                             let respuesta = document.createElement("div");
@@ -597,7 +681,18 @@ function init() {
 
                             addCruz(nuevoBloque); // Añadimos el icono de borrado
                             
-                            insertAsLastChild(cuestionario, nuevoBloque); // Añadimos cada pregunta perteneciente al cuestionario
+                            if(r.result[j].destacada == "true"){
+                                nuevoBloque.setAttribute("data-destacada", "true");
+
+                                // Obtenemos una referencia a la primera pregunta del cuestionario si la hubiera
+                                let primeraPregunta = cuestionario.querySelector(".bloque");
+                                insertBeforeChild(cuestionario, primeraPregunta, nuevoBloque); // Añadimos la pregunta al principio del cuestionario
+
+                            }
+                            else if(r.result[j].destacada == "false"){
+                                nuevoBloque.setAttribute("data-destacada", "false");
+                                insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la pregunta al final del cuestionario
+                            }
 
                         }
 

@@ -211,7 +211,7 @@ app.post(config.app.base+'/:temaId/pregunta', async (req, res) => {
 
     var preguntaId = Math.random().toString(36).substring(7); // Generamos un id aleatorio para la pregunta
 
-    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta };
+    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta,destacada:"false" };
     await knex('preguntas').insert(pregunta);
 
     res.status(200).send({ result:{preguntaId:preguntaId},error:null });
@@ -263,7 +263,7 @@ app.get(config.app.base+'/preguntas/:cuestionarioId', async (req, res) => {
       return;
     }*/
 
-    let preguntasYrespuestas = await knex('preguntas').select('*')
+    let preguntasYrespuestas = await knex('preguntas').select(['preguntaId','textoPregunta','respuestaCorrecta','destacada'])
                                   .where('temaId',req.params.cuestionarioId);
     res.status(200).send({ result:preguntasYrespuestas,error:null });
   } catch (error) {
@@ -321,6 +321,35 @@ app.delete(config.app.base+'/:cuestionarioId', async (req, res) => {
 
 });
 
+// Cambia el valor de la propiedad destacada de una pregunta en la base de datos
+app.put(config.app.base+'/editarDestacada/:preguntaId', async (req, res) => {
+
+  // Comprobamos que en el body venga el nuevo estado de colapsada de la pregunta
+  if (!req.body.destacada) {
+    res.status(404).send({ result:null,error:'datos mal formados para modificar la propiedad destacada de una pregunta' });
+    return;
+  }
+
+  try {
+
+    // Comprobamos que exista la pregunta
+    let existe= await existePreguntaPorId(req.params.preguntaId);
+    if (!existe) {
+      res.status(404).send({ result:null,error:`pregunta con id ${req.params.preguntaId} no existente` });
+      return;  
+    }
+
+    await knex('preguntas').update('destacada', req.body.destacada)
+                                .where('preguntaId',req.params.preguntaId);
+
+    res.status(200).send({ result:'ok',error:null });
+    
+  } catch (error) {
+    console.log(`No se pudo modificar el estado de destacada: ${error}`);
+    res.status(404).send({ result:null,error:'no se pudo modificar el estado de destacada de la pregunta' });
+  }
+
+});
 
 // borra toda la base de datos:
 /*app.get(config.app.base+'/clear', async (req,res) => {

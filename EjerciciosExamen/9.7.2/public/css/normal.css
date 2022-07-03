@@ -85,16 +85,22 @@ main{
     cursor: pointer;
 }
 
-.destaca[data-destacada="true"] {
+.bloque[data-destacada="true"] .destaca {
 
     position: absolute;
+    right: 20px;
+    top: 1px;
     color: red;
+    cursor: pointer;
 
 }
-.destaca[data-destacada="false"] {
+.bloque[data-destacada="false"] .destaca {
 
     position: absolute;
+    right: 20px;
+    top: 1px;
     color: black;
+    cursor: pointer;
 
 }
 

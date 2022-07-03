@@ -51,6 +51,7 @@ async function creaEsquema(res) {
         table.integer('temaId').notNullable();
         table.string('textoPregunta', 100).notNullable();
         table.integer('respuestaCorrecta').notNullable(); // Verdadero/True es 1 y Falso/False es 0
+        table.string('conversionHTML', 10).notNullable(); // Recibirá true o false
 
         // Definimos la clave ajena:
         table.foreign('temaId').references('cuestionarios.cuestionarioId');
@@ -210,7 +211,7 @@ app.post(config.app.base+'/:temaId/pregunta', async (req, res) => {
 
     var preguntaId = Math.random().toString(36).substring(7); // Generamos un id aleatorio para la pregunta
 
-    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta };
+    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta,conversionHTML:"true" };
     await knex('preguntas').insert(pregunta);
 
     res.status(200).send({ result:{preguntaId:preguntaId},error:null });
@@ -262,12 +263,78 @@ app.get(config.app.base+'/preguntas/:cuestionarioId', async (req, res) => {
       return;
     }*/
 
-    let preguntasYrespuestas = await knex('preguntas').select(['preguntaId','textoPregunta','respuestaCorrecta'])
+    let preguntasYrespuestas = await knex('preguntas').select(['preguntaId','textoPregunta','respuestaCorrecta','conversionHTML'])
                                   .where('temaId',req.params.cuestionarioId);
     res.status(200).send({ result:preguntasYrespuestas,error:null });
   } catch (error) {
     console.log(`No se pudieron obtener las preguntas: ${error}`);
     res.status(404).send({ result:null,error:'no se pudieron obtener las preguntas' });
+  }
+});
+
+// Devuelve el texto de la pregunta recibido en markdown a html
+app.get(config.app.base+'/convierte/:texto', async (req, res) => {
+
+  try {
+
+    // Convertimos el texto en markdown recibido
+    let cadenasDelTexto = req.params.texto.split(" ");
+    let cadenaHTML = "";
+
+    // Analizamos cada cadena del texto de la pregunta
+    for(let i=0; i<cadenasDelTexto.length; i++){
+
+      let regex = /\*\*[\w]+\*\*/;
+      if (regex.test(cadenasDelTexto[i])){
+        let regex = /\*/g;
+        let replacement = "";
+        let textoProcesado = cadenasDelTexto[i].replace(regex, replacement);
+        replacement = `<strong>${textoProcesado}</strong>`;
+        cadenasDelTexto[i] = replacement;
+      }
+
+      regex = /\*[\w]+\*/;
+      if (regex.test(cadenasDelTexto[i])){
+        let regex = /\*/g;
+        let replacement = "";
+        let textoProcesado = cadenasDelTexto[i].replace(regex, replacement);
+        replacement = `<em>${textoProcesado}</em>`;
+        cadenasDelTexto[i] = replacement;
+      }
+
+      let href;
+
+      regex = /\(([^)]+)\)/;
+      if (regex.test(cadenasDelTexto[i])){
+        let regex = /\(|\)/g;
+        let replacement = "";
+        let textoProcesado = cadenasDelTexto[i].replace(regex, replacement);
+        href = textoProcesado;
+      }
+
+      regex = /\[([^]]+)\]/;
+      if (regex.test(cadenasDelTexto[i])){
+          let regex = /\[|\]/g
+          let replacement = "";
+          let textoProcesado = cadenasDelTexto[i].replace(regex, replacement);
+          replacement = `<a href=${href}>${textoProcesado}</a>`;
+          cadenasDelTexto[i] = replacement;
+      }
+
+      if (i == cadenasDelTexto.length-1){
+        cadenaHTML += cadenasDelTexto[i];
+      } else {
+        cadenaHTML += cadenasDelTexto[i] + " ";
+      }
+
+    }
+
+    // Y lo devolvemos en HTML
+    res.status(200).send({ result:cadenaHTML,error:null });
+
+  } catch (error) {
+    console.log(`No se pudo convertir el texto: ${error}`);
+    res.status(404).send({ result:null,error:'no se pudieron obtener el texto convertido' });
   }
 });
 

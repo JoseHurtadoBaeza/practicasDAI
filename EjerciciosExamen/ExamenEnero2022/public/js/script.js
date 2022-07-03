@@ -34,6 +34,20 @@ function addCruz(nodo) {
 
 }
 
+function addRadioButton(nodoMain) {
+
+    let label = document.createElement("label");
+    label.textContent = "Conversión a HTML";
+    let radioButton = document.createElement("input");
+    radioButton.setAttribute("type", "radio");
+    radioButton.checked = true; // Por defecto se realiza la conversión a HTML
+    radioButton.className = "conversion";
+    insertAsFirstChild(label, radioButton);
+    insertAsFirstChild(nodoMain, label); // Lo insertamos como primer hijo del main
+    radioButton.addEventListener("click", actualizarVistaPreguntas, false);
+
+}
+
 // FUNCIONES AUXILIARES
 
 /* Inserta el nodo nuevoHijo como último hijo del nodo padre */
@@ -84,6 +98,93 @@ function queryAncestorSelector(node, selector){
 
 /* Función que nos permite borrar preguntas de los cuestionarios */
 function borraPregunta(event) {
+
+    let bloquePregunta = queryAncestorSelector(event.target, ".bloque"); // Referencia a la pregunta
+
+    let cuestionario = queryAncestorSelector(bloquePregunta, "section"); // Referencia al cuestionario
+
+    let preguntaId = bloquePregunta.getAttribute("data-identificadorbd"); 
+
+    event.preventDefault();
+    const url= `${base}/pregunta/${preguntaId}`;
+    const payload= {}; 
+    var request = {
+        method: 'DELETE', 
+        headers: cabeceras,
+        body: JSON.stringify(payload),
+    };
+    fetch(url,request)
+    .then( response => response.json() )
+    .then( r => {
+
+        if (r.error != null){
+            throw new Error("Error al borrar la pregunta con id " + preguntaId + ":" + r.error);
+        }
+
+        removeElement(bloquePregunta); // Borramos el bloque con la pregunta
+
+        // Si no quedan preguntas en el cuestionario lo borramos así como su enlace y la descripción
+        if(cuestionario.querySelector(".bloque") == null){
+        
+            let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
+
+            event.preventDefault(); // Evitamos la recarga de la página
+            const url= `${base}/${cuestionarioId}`;
+            const payload= {};
+            var request = {
+                method: 'DELETE', 
+                headers: cabeceras,
+                body: JSON.stringify(payload),
+            };
+            fetch(url,request)
+            /*.then( response => {
+                if (!response.ok){
+                    throw new Error("No se ha podido establecer la conexión con el servidor")
+                }
+                response.json() 
+            })*/
+            .then( response => response.json())
+            .then( r  => {
+                
+                if (r.error != null) {
+                    throw new Error("Error al borrar el cuestionario cuyo tema es " + cuestionarioId + ":" + r.error);
+                }
+
+                // Nos guardamos todos los enlaces actuales
+                let links = document.querySelectorAll("header nav ul a");
+
+                // Nos guardamos el selector para la comparación
+                let href = "#" + cuestionario.getAttribute("id");
+
+                let encontrado = false;
+
+                // Buscamos el enlace que case con el hrefs
+                for (let i = 0; i < links.length && !encontrado; i++){
+
+                    if(links[i].getAttribute("href") == href){
+
+                        removeElement(queryAncestorSelector(links[i], "li")); // Borramos el elemento li de la lista que contiene el enlace
+                        encontrado = true;
+
+                    }
+
+                }
+
+                removeElement(cuestionario); // Elmininamos el cuestionario
+            
+            })
+            .catch( (error) => window.alert(error) );
+
+
+        }
+
+    })
+    .catch( error => window.alert(error) );
+
+} 
+
+/* Función que actualiza la vista de las preguntas */
+function actualizarVistaPreguntas(event) {
 
     let bloquePregunta = queryAncestorSelector(event.target, ".bloque"); // Referencia a la pregunta
 
@@ -389,7 +490,7 @@ function addPregunta(event){
 
                 let pregunta = document.createElement("div");
                 pregunta.className = "pregunta";
-                pregunta.innerHTML = payload.textoPregunta; // Obtenemos el valor del payload, porque no podemos acceder al valor de las variables externas
+                pregunta.innerHTML = payload.textoPregunta;
                 insertAsLastChild(nuevoBloque, pregunta);
 
                 let respuesta = document.createElement("div");
@@ -477,12 +578,6 @@ function addCuestionario(event) {
             body: JSON.stringify(payload),
         };
         fetch(url,request)
-        /*.then( response => {
-            if (!response.ok){
-                throw new Error("No se ha podido establecer la conexión con el servidor")
-            }
-            response.json() 
-        })*/
         .then( response => response.json())
         .then( r => {
             if (r.error != null){
@@ -504,7 +599,6 @@ function addCuestionario(event) {
 
 }
 
-
 function init() {
 
     /*let preguntas = document.querySelectorAll(".bloque"); // Nos guardamos todos las preguntas
@@ -520,7 +614,10 @@ function init() {
     for(let i = 0; i < cuestionarios.length; i++){
         addFormPregunta(cuestionarios[i]);
     }*/
-    
+
+    let main = document.querySelector("main");
+    addRadioButton(main); // Añadimos el botón para determinar si queremos que se haga o no la conversión al mostrar las preguntas
+
     // Utilizamos el nuevo servicio para obtener los temas de cuestionarios almacenados en la BD
     // y así poder generar los cuestionarios en el html al cargar la aplicación
     const url= `${base}/cuestionarios`;
@@ -571,7 +668,38 @@ function init() {
 
                             let pregunta = document.createElement("div");
                             pregunta.className = "pregunta";
-                            pregunta.innerHTML = r.result[j].textoPregunta; // Obtenemos el valor del payload, porque no podemos acceder al valor de las variables externas
+
+                            let textoPregunta = r.result[j].textoPregunta;
+
+                            // Obtenemos la conversión a HTML del texto de la pregunta siempre que la conversión esté activada
+                            if (r.result[j].conversionHTML == "true"){
+
+                                const url= `${base}/convierte/${textoPregunta}`;
+                                const request = {
+                                    method: 'GET', 
+                                    headers: cabeceras,
+                                };
+                                fetch(url, request)
+                                .then( response => response.json())
+                                .then( r => {
+                
+                                    if (r.error != null){
+                                        throw new Error("Error al obtener el estado de la conversión HTML: " + r.error)
+                                    }
+                
+                                    if (r.result){
+                                    
+                                        pregunta.innerHTML = r.result;
+                
+                                    }
+                
+                                })
+                                .catch( error => window.alert(error) );
+
+                            } else {
+                                pregunta.innerHTML = r.result[j].textoPregunta;
+                            }
+                            
                             insertAsLastChild(nuevoBloque, pregunta);
 
                             let respuesta = document.createElement("div");

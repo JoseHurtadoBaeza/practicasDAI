@@ -424,8 +424,89 @@ function addPregunta(event){
 
 }
 
+/* Función que colapsa o expande las preguntas del cuestionario dependiendo del estado anterior */
+function colapsaCuestionario(event){
+
+    // Obtenemos la referencia al cuestionario
+    let cuestionario = queryAncestorSelector(event.target, "section");
+    let colapsado = cuestionario.getAttribute("data-colapsado");
+
+    // Si el cuestionario está colapsado lo expandimos
+    if(colapsado == "true"){
+
+        let cuestionarioId = cuestionario.getAttribute("data-identificadorbd"); // Obtenemos el identificador del cuestionario en la BD
+
+        event.preventDefault(); // Evitamos la recarga de la página
+        const url= `${base}/editarColapsado/${cuestionarioId}`;
+        const payload= {colapsado:"false"};
+        var request = {
+            method: 'PUT', 
+            headers: cabeceras,
+            body: JSON.stringify(payload),
+        };
+        fetch(url,request)
+        .then( response => response.json())
+        .then( r  => {
+            
+            if (r.error != null) {
+                throw new Error("Error al actualizar el estado de colapsado del cuestionario cuyo id es " + cuestionarioId + ":" + r.error);
+            }
+
+            // Actualizamos el valor del atributo data-colapsado del cuestionario
+            cuestionario.setAttribute("data-colapsado", "false");
+
+            // No mostramos el número de preguntas ocultas
+            let preguntasOcultas = cuestionario.querySelector(".ocultas");
+            preguntasOcultas.textContent = "";
+        
+        })
+        .catch( (error) => window.alert(error) );
+
+
+    } else { // Si está expandido lo colapsamos
+
+        let cuestionarioId = cuestionario.getAttribute("data-identificadorbd"); // Obtenemos el identificador del cuestionario en la BD
+
+        event.preventDefault(); // Evitamos la recarga de la página
+        const url= `${base}/editarColapsado/${cuestionarioId}`;
+        const payload= {colapsado:"true"};
+        var request = {
+            method: 'PUT', 
+            headers: cabeceras,
+            body: JSON.stringify(payload),
+        };
+        fetch(url,request)
+        .then( response => response.json())
+        .then( r  => {
+            
+            if (r.error != null) {
+                throw new Error("Error al actualizar el estado de colapsado del cuestionario cuyo id es " + cuestionarioId + ":" + r.error);
+            }
+
+            // Actualizamos el valor del atributo data-colapsado del cuestionario
+            cuestionario.setAttribute("data-colapsado", "true");
+
+            // Mostramos el número de preguntas colapsadas
+            let preguntasOcultas = cuestionario.querySelector(".ocultas");
+            let numPreguntas = cuestionario.querySelectorAll(".bloque").length;
+            preguntasOcultas.textContent = "El número de preguntas ocultas es " + numPreguntas;
+
+            
+        
+        })
+        .catch( (error) => window.alert(error) );
+
+    }
+
+}
+
 /* Función que forma el código html de los cuestionarios y lo incrusta en el main */
 function insertaCuestionario(cuestionario){
+
+    let botonColapsar = document.createElement("button");
+    botonColapsar.textContent = "Colapsado/Expandido";
+    insertAsLastChild(cuestionario, botonColapsar);
+    botonColapsar.addEventListener("click", colapsaCuestionario, false);
 
     let componente = document.createElement("encabezado-cuestionario");
     componente.setAttribute("data-tema", cuestionario.id);
@@ -477,12 +558,6 @@ function addCuestionario(event) {
             body: JSON.stringify(payload),
         };
         fetch(url,request)
-        /*.then( response => {
-            if (!response.ok){
-                throw new Error("No se ha podido establecer la conexión con el servidor")
-            }
-            response.json() 
-        })*/
         .then( response => response.json())
         .then( r => {
             if (r.error != null){
@@ -493,6 +568,10 @@ function addCuestionario(event) {
                 let cuestionarioId = r.result.cuestionarioId;
                 cuestionario.setAttribute("data-identificadorbd", cuestionarioId); // Atributo para guardar el id del cuestionario en la BD
                 cuestionario.setAttribute("data-colapsado", "false"); // Por defecto no estarán colapsadas las preguntas
+                let preguntasOcultas = document.createElement("div");
+                preguntasOcultas.className = "ocultas";
+                preguntasOcultas.textContent = "";
+                insertAsLastChild(cuestionario, preguntasOcultas);
                 insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main del html
             }
         })
@@ -530,11 +609,6 @@ function init() {
         headers: cabeceras,
     };
     fetch(url,request)
-    /*.then( response => 
-        if (!response.ok){
-            throw new Error("No se ha podido establecer la conexión con el servidor")
-        }
-        response.json())*/
     .then( response => response.json())
     .then( r => {
 
@@ -548,62 +622,84 @@ function init() {
                 let cuestionario = document.createElement("section");
                 cuestionario.id = r.result[i].tema; // Le añadimos el id
                 cuestionario.setAttribute("data-identificadorbd", r.result[i].cuestionarioId);
-                cuestionario.setAttribute("data-colapsado", r.result[i].colapsado);
                 let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
 
-                insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main
-
-                // Insertamos las preguntas almacenadas en la BD de dicho cuestionario
-                const url= `${base}/preguntas/${cuestionarioId}`;
+                // Obtenemos el estado de colapsado del cuestionario
+                const url= `${base}/colapsado/${cuestionarioId}`;
                 const request = {
                     method: 'GET', 
                     headers: cabeceras,
                 };
-                fetch(url, request)
+                fetch(url,request)
                 .then( response => response.json())
                 .then( r => {
 
                     if (r.error != null){
-                        throw new Error("Error al obtener las preguntas de la BD: " + r.error)
+                        throw new Error("Error al obtener el estado de colapsado del cuestionario con id " + cuestionario.id + ":" + r.error);
                     }
-
+        
                     if (r.result){
-                        
-                        for(var j=0;j<r.result.length;j++) {
 
-                            // Generamos el HTML correspondiente a una bloque de pregunta
-                            let nuevoBloque = document.createElement("div");
-                            nuevoBloque.className = "bloque";
-                            nuevoBloque.setAttribute("data-identificadorbd", r.result[j].preguntaId); // Atributo para guardar el id de la pregunta en la BD
+                        cuestionario.setAttribute("data-colapsado", r.result[0].colapsado);
+                        insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main del html
+                        let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
 
-                            let pregunta = document.createElement("div");
-                            pregunta.className = "pregunta";
-                            pregunta.innerHTML = r.result[j].textoPregunta; // Obtenemos el valor del payload, porque no podemos acceder al valor de las variables externas
-                            insertAsLastChild(nuevoBloque, pregunta);
+                        // Insertamos las preguntas almacenadas en la BD de dicho cuestionario
+                        const url= `${base}/preguntas/${cuestionarioId}`;
+                        const request = {
+                            method: 'GET', 
+                            headers: cabeceras,
+                        };
+                        fetch(url, request)
+                        .then( response => response.json())
+                        .then( r => {
 
-                            let respuesta = document.createElement("div");
-                            respuesta.className = "respuesta";
-                            
-                            // No podemos consultar los valores de las variables externas, así que consultamos el payload
-                            if(r.result[j].respuestaCorrecta == "Verdadero"){
-                                respuesta.setAttribute("data-valor", "true");
-                            }
-                            else if(r.result[j].respuestaCorrecta == "Falso"){
-                                respuesta.setAttribute("data-valor", "false");
+                            if (r.error != null){
+                                throw new Error("Error al obtener las preguntas de la BD: " + r.error)
                             }
 
-                            insertAsLastChild(nuevoBloque, respuesta);
+                            if (r.result){
+                                
+                                for(var j=0;j<r.result.length;j++) {
 
-                            addCruz(nuevoBloque); // Añadimos el icono de borrado
-                            
-                            insertAsLastChild(cuestionario, nuevoBloque); // Añadimos cada pregunta perteneciente al cuestionario
+                                    // Generamos el HTML correspondiente a una bloque de pregunta
+                                    let nuevoBloque = document.createElement("div");
+                                    nuevoBloque.className = "bloque";
+                                    nuevoBloque.setAttribute("data-identificadorbd", r.result[j].preguntaId); // Atributo para guardar el id de la pregunta en la BD
 
-                        }
+                                    let pregunta = document.createElement("div");
+                                    pregunta.className = "pregunta";
+                                    pregunta.innerHTML = r.result[j].textoPregunta; // Obtenemos el valor del payload, porque no podemos acceder al valor de las variables externas
+                                    insertAsLastChild(nuevoBloque, pregunta);
+
+                                    let respuesta = document.createElement("div");
+                                    respuesta.className = "respuesta";
+                                    
+                                    // No podemos consultar los valores de las variables externas, así que consultamos el payload
+                                    if(r.result[j].respuestaCorrecta == "Verdadero"){
+                                        respuesta.setAttribute("data-valor", "true");
+                                    }
+                                    else if(r.result[j].respuestaCorrecta == "Falso"){
+                                        respuesta.setAttribute("data-valor", "false");
+                                    }
+
+                                    insertAsLastChild(nuevoBloque, respuesta);
+
+                                    addCruz(nuevoBloque); // Añadimos el icono de borrado
+                                    
+                                    insertAsLastChild(cuestionario, nuevoBloque); // Añadimos cada pregunta perteneciente al cuestionario
+
+                                }
+
+                            }
+
+                        })
+                        .catch( error => window.alert(error) );
+
 
                     }
-
                 })
-                .catch( error => window.alert(error) );
+                .catch( (error) => window.alert(error) );
 
 
             }

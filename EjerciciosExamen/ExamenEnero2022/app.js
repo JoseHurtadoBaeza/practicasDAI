@@ -221,7 +221,7 @@ app.post(config.app.base+'/:temaId/pregunta', async (req, res) => {
 
     var preguntaId = Math.random().toString(36).substring(7); // Generamos un id aleatorio para la pregunta
 
-    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta,conversionHTML:"true" };
+    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta };
     await knex('preguntas').insert(pregunta);
 
     res.status(200).send({ result:{preguntaId:preguntaId},error:null });
@@ -273,7 +273,7 @@ app.get(config.app.base+'/preguntas/:cuestionarioId', async (req, res) => {
       return;
     }*/
 
-    let preguntasYrespuestas = await knex('preguntas').select(['preguntaId','textoPregunta','respuestaCorrecta','conversionHTML'])
+    let preguntasYrespuestas = await knex('preguntas').select(['preguntaId','textoPregunta','respuestaCorrecta'])
                                   .where('temaId',req.params.cuestionarioId);
     res.status(200).send({ result:preguntasYrespuestas,error:null });
   } catch (error) {
@@ -307,7 +307,7 @@ app.get(config.app.base+'/conversionHTML', async (req, res) => {
 
     let conversionHTML = await knex('conversionHTML').select('estadoConversion');
     
-    res.status(200).send({ result:conversionHTML,error:null });
+    res.status(200).send({ result:conversionHTML[0].estadoConversion,error:null });
     
   } catch (error) {
     console.log(`No se pudo obtener el estado de conversion HTML de las preguntas: ${error}`);

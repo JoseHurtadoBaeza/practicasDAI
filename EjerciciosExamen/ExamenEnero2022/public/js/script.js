@@ -34,13 +34,13 @@ function addCruz(nodo) {
 
 }
 
-function addRadioButton(nodoMain) {
+function addRadioButton(nodoMain, estadoConversion) {
 
     let label = document.createElement("label");
     label.textContent = "Conversión a HTML";
     let radioButton = document.createElement("input");
     radioButton.setAttribute("type", "radio");
-    radioButton.setAttribute("checked", "true");
+    radioButton.setAttribute("checked", estadoConversion);
     radioButton.className = "conversion";
     insertAsFirstChild(label, radioButton);
     insertAsFirstChild(nodoMain, label); // Lo insertamos como primer hijo del main
@@ -187,7 +187,9 @@ function borraPregunta(event) {
 function actualizarVistaPreguntas(event) {
     
         // Obtenemos la información de si el radio button está checked o no
-        let radioButton = event.target;
+        let label = queryAncestorSelector(event.target, "label");
+        let radioButton = label.querySelector(".conversion");
+        console.log(radioButton);
 
         // Si estaba activada la conversión a html la desactivamos
         if(radioButton.checked == true){
@@ -210,15 +212,16 @@ function actualizarVistaPreguntas(event) {
                 }
     
                 if (r.result){
+
                     radioButton.checked = false;
     
                     // Actualizamos el texto de todas las preguntas 
-                    /*let preguntas = querySelectorAll(".pregunta"); // Obtenemos la referencia de todas las preguntas    
+                    let preguntas = document.querySelectorAll(".bloque"); // Obtenemos la referencia de todas las preguntas    
     
                     for (let i=0; i<preguntas.length; i++){
                         
-                        preguntas.textContent = r.result[]
-                    }*/
+                        //preguntas.textContent = r.result[]
+                    }
                 }
 
             
@@ -226,7 +229,7 @@ function actualizarVistaPreguntas(event) {
             .catch( (error) => window.alert(error) );
     
     
-        } else { // Sino estaba activada la volvemos a activar
+        } else if (radioButton.checked == false){ // Sino estaba activada la volvemos a activar
     
             let nuevoEstado = "true";
     
@@ -245,6 +248,7 @@ function actualizarVistaPreguntas(event) {
                 }
     
                 if (r.result){
+                    
                     radioButton.checked = true;
     
                     // Actualizamos el texto de todas las preguntas 
@@ -260,6 +264,8 @@ function actualizarVistaPreguntas(event) {
             })
             .catch( (error) => window.alert(error) );
     
+        } else {
+            winwow.alert("Algo está fallando al clickar en el botón");
         }
 
 } 
@@ -652,15 +658,12 @@ function init() {
 
         if (r.result){
 
-            if (r.result == "false"){
-
-                let main = document.querySelector("main");
-                addRadioButton(main, "false"); // Añadimos el botón para determinar si queremos que se haga o no la conversión al mostrar las preguntas
-
-            } else if (r.result == "true"){
-
+            if (r.result == "true"){
                 let main = document.querySelector("main");
                 addRadioButton(main, "true"); // Añadimos el botón para determinar si queremos que se haga o no la conversión al mostrar las preguntas
+            } else if (r.result == "false"){
+                let main = document.querySelector("main");
+                addRadioButton(main, "false"); // Añadimos el botón para determinar si queremos que se haga o no la conversión al mostrar las preguntas
             }
 
         }

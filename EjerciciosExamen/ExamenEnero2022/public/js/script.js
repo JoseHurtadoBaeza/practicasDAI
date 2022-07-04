@@ -358,7 +358,7 @@ function addFormPregunta(nodoSection) {
 
     var descripcion = document.createElement("div");
     descripcion.className = "wiki";
-
+´
     fetch('https://es.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=extracts&exintro&explaintext&continue&titles=' + terminoBuscar)
     .then(function(response) { // Obtenemos la respuesta
         if(!response.ok){
@@ -481,6 +481,8 @@ function addPregunta(event){
                 throw new Error("Error al crear la pregunta para el cuestionario con id " + cuestionarioId + ": " + r.error);
             }
 
+            let textoPregunta = payload.textoPregunta; // Accedo al payload porque no he conseguido acceder al valor de una variable externa
+
             if (r.result){
 
                 // Generamos el HTML correspondiente a una bloque de pregunta
@@ -490,26 +492,51 @@ function addPregunta(event){
 
                 let pregunta = document.createElement("div");
                 pregunta.className = "pregunta";
-                pregunta.innerHTML = payload.textoPregunta;
-                insertAsLastChild(nuevoBloque, pregunta);
 
-                let respuesta = document.createElement("div");
-                respuesta.className = "respuesta";
-                
-                // No podemos consultar los valores de las variables externas, así que consultamos el payload
-                if(payload.respuestaCorrecta == "Verdadero"){
-                    respuesta.setAttribute("data-valor", "true");
-                }
-                else if(payload.respuestaCorrecta == "Falso"){
-                    respuesta.setAttribute("data-valor", "false");
-                }
+                // Obtenemos el texto de la pregunta convertido a html por defecto
+                const url= `${base}/convierte`;
+                const payload = {
+                    texto:textoPregunta,
+                };
+                const request = {
+                    method: 'PUT', 
+                    headers: cabeceras,
+                    body: JSON.stringify(payload),
+                };
+                fetch(url, request)
+                .then( response => response.json())
+                .then( r => {
 
-                insertAsLastChild(nuevoBloque, respuesta);
+                    if (r.error != null){
+                        throw new Error("Error al obtener el estado de la conversión HTML: " + r.error)
+                    }
 
-                addCruz(nuevoBloque); // Añadimos el icono de borrado
-                
-                let cuestionario = queryAncestorSelector(event.target, "section"); // Nos guardamos una referencia al cuestionario actual
-                insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la nueva pregunta a dicho cuestionario
+                    if (r.result){
+
+                        pregunta.innerHTML = r.result;
+                        insertAsLastChild(nuevoBloque, pregunta);
+        
+                        let respuesta = document.createElement("div");
+                        respuesta.className = "respuesta";
+                        
+                        // No podemos consultar los valores de las variables externas, así que consultamos el payload
+                        if(payload.respuestaCorrecta == "Verdadero"){
+                            respuesta.setAttribute("data-valor", "true");
+                        }
+                        else if(payload.respuestaCorrecta == "Falso"){
+                            respuesta.setAttribute("data-valor", "false");
+                        }
+        
+                        insertAsLastChild(nuevoBloque, respuesta);
+        
+                        addCruz(nuevoBloque); // Añadimos el icono de borrado
+                        
+                        let cuestionario = queryAncestorSelector(event.target, "section"); // Nos guardamos una referencia al cuestionario actual
+                        insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la nueva pregunta a dicho cuestionario
+                    }
+
+                })
+                .catch( error => window.alert(error) );
 
             }
 
@@ -692,9 +719,7 @@ function init() {
                                     }
                 
                                     if (r.result){
-                                    
                                         pregunta.innerHTML = r.result;
-                
                                     }
                 
                                 })

@@ -40,8 +40,13 @@ function addRadioButton(nodoMain, estadoConversion) {
     label.textContent = "Conversión a HTML";
     let radioButton = document.createElement("input");
     radioButton.setAttribute("type", "radio");
-    radioButton.setAttribute("checked", estadoConversion);
-    radioButton.className = "conversion";
+    radioButton.setAttribute("data-pulsado", estadoConversion);
+    if (estadoConversion === "true"){
+        radioButton.checked = true;
+    } else if (estadoConversion === "false"){
+        radioButton.checked = false;
+    }
+    radioButton.id = "conversion";
     insertAsFirstChild(label, radioButton);
     insertAsFirstChild(nodoMain, label); // Lo insertamos como primer hijo del main
     radioButton.addEventListener("click", actualizarVistaPreguntas, false);
@@ -186,13 +191,15 @@ function borraPregunta(event) {
 /* Función que actualiza la vista de las preguntas */
 function actualizarVistaPreguntas(event) {
     
+        //event.preventDefault(); // Prevenimos la recarga de la página al pulsar el radio button
+
         // Obtenemos la información de si el radio button está checked o no
         let label = queryAncestorSelector(event.target, "label");
-        let radioButton = label.querySelector(".conversion");
-        console.log(radioButton);
+        let radioButton = document.getElementById("conversion");
+        //console.log(radioButton);
 
         // Si estaba activada la conversión a html la desactivamos
-        if(radioButton.checked == true){
+        if(radioButton.getAttribute("data-pulsado") == "true"){
     
             //let cuestionarioId = cuestionario.getAttribute("data-identificadorbd"); // Obtenemos el identificador del cuestionario en la BD
             let nuevoEstado = "false";
@@ -213,6 +220,7 @@ function actualizarVistaPreguntas(event) {
     
                 if (r.result){
 
+                    radioButton.setAttribute("data-pulsado", nuevoEstado);
                     radioButton.checked = false;
     
                     // Actualizamos el texto de todas las preguntas 
@@ -229,7 +237,7 @@ function actualizarVistaPreguntas(event) {
             .catch( (error) => window.alert(error) );
     
     
-        } else if (radioButton.checked == false){ // Sino estaba activada la volvemos a activar
+        } else if (radioButton.getAttribute("data-pulsado") == "false"){ // Sino estaba activada la volvemos a activar
     
             let nuevoEstado = "true";
     
@@ -249,6 +257,7 @@ function actualizarVistaPreguntas(event) {
     
                 if (r.result){
                     
+                    radioButton.setAttribute("data-pulsado", nuevoEstado);
                     radioButton.checked = true;
     
                     // Actualizamos el texto de todas las preguntas 
@@ -473,6 +482,10 @@ function addPregunta(event){
             headers: cabeceras,
             body: JSON.stringify(payload),
         };
+
+        let textoPregunta = enunciado.value;
+        let respuestaCorrect = respuestaCorrecta;
+
         fetch(url,request)
         .then( response => response.json() )
         .then( r => {
@@ -483,7 +496,7 @@ function addPregunta(event){
 
             if (r.result){
 
-                let questionText = payload.textoPregunta;
+                //let questionText = payload.textoPregunta;
 
                 // Generamos el HTML correspondiente a una bloque de pregunta
                 let nuevoBloque = document.createElement("div");
@@ -497,17 +510,17 @@ function addPregunta(event){
                 respuesta.className = "respuesta";
                 
                 // No podemos consultar los valores de las variables externas, así que consultamos el payload
-                if(payload.respuestaCorrecta == "Verdadero"){
+                if(respuestaCorrect == "Verdadero"){
                     respuesta.setAttribute("data-valor", "true");
                 }
-                else if(payload.respuestaCorrecta == "Falso"){
+                else if(respuestaCorrect == "Falso"){
                     respuesta.setAttribute("data-valor", "false");
                 }
 
                 // Obtenemos el texto de la pregunta convertido a html por defecto
                 const url= `${base}/convierte`;
                 payload = {
-                    texto:questionText,
+                    texto:textoPregunta,
                 };
                 const request = {
                     method: 'PUT', 
@@ -648,6 +661,9 @@ function init() {
         method: 'GET', 
         headers: cabeceras,
     };
+
+    var conversionActivada;
+
     fetch(url, request)
     .then( response => response.json())
     .then( r => {
@@ -659,9 +675,11 @@ function init() {
         if (r.result){
 
             if (r.result == "true"){
+                conversionActivada = true;
                 let main = document.querySelector("main");
                 addRadioButton(main, "true"); // Añadimos el botón para determinar si queremos que se haga o no la conversión al mostrar las preguntas
             } else if (r.result == "false"){
+                conversionActivada = false;
                 let main = document.querySelector("main");
                 addRadioButton(main, "false"); // Añadimos el botón para determinar si queremos que se haga o no la conversión al mostrar las preguntas
             }
@@ -725,7 +743,7 @@ function init() {
                             let textoPregunta = r.result[j].textoPregunta;
 
                             // Obtenemos la conversión a HTML del texto de la pregunta siempre que la conversión esté activada
-                            if (r.result[j].conversionHTML == "true"){
+                            if (conversionActivada){
 
                                 const url= `${base}/convierte`;
                                 const payload = {
@@ -751,8 +769,10 @@ function init() {
                                 })
                                 .catch( error => window.alert(error) );
 
-                            } else {
+                            } else if (!conversionActivada){
                                 pregunta.innerHTML = r.result[j].textoPregunta;
+                            } else {
+                                window.alert("Hay un problema con la conversión en el init");
                             }
                             
                             insertAsLastChild(nuevoBloque, pregunta);

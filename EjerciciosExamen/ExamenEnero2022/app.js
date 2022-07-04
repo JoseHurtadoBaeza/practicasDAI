@@ -51,7 +51,6 @@ async function creaEsquema(res) {
         table.integer('temaId').notNullable();
         table.string('textoPregunta', 100).notNullable();
         table.integer('respuestaCorrecta').notNullable(); // Verdadero/True es 1 y Falso/False es 0
-        table.string('conversionHTML', 10).notNullable(); // Recibirá true o false
 
         // Definimos la clave ajena:
         table.foreign('temaId').references('cuestionarios.cuestionarioId');

@@ -273,13 +273,19 @@ app.get(config.app.base+'/preguntas/:cuestionarioId', async (req, res) => {
 });
 
 // Devuelve el texto de la pregunta recibido en markdown a html
-app.get(config.app.base+'/convierte/:texto', async (req, res) => {
+app.put(config.app.base+'/convierte', async (req, res) => {
+
+  // Comprobamos que en el body vengan el id de la pregunta, el texto de la pregunta y la respuesta correcta
+  if (!req.body.texto) {
+    res.status(404).send({ result:null,error:'datos mal formados para obtener el texto de la pregunta convertido en html' });
+    return;
+  }
 
   try {
 
     // Convertimos el texto en markdown recibido
-    let cadenasDelTexto = req.params.texto.split(" ");
-    let cadenaHTML = "";
+    let cadenasDelTexto = req.body.texto.split(" ");
+    var cadenaHTML = "";
 
     // Analizamos cada cadena del texto de la pregunta
     for(let i=0; i<cadenasDelTexto.length; i++){
@@ -302,23 +308,21 @@ app.get(config.app.base+'/convierte/:texto', async (req, res) => {
         cadenasDelTexto[i] = replacement;
       }
 
-      let href;
-
-      regex = /\(([^)]+)\)/;
+      regex = /\[[^)]+\)/; // Seleccionamos todo el texto
       if (regex.test(cadenasDelTexto[i])){
-        let regex = /\(|\)/g;
+
+        let cadenas = cadenasDelTexto[i].split("]"); // Separamos el texto del enlace y el url
+
+        let regex = /\[|\]/g; // Quitamos los corchetes a la primera cadena
         let replacement = "";
-        let textoProcesado = cadenasDelTexto[i].replace(regex, replacement);
-        href = textoProcesado;
-      }
+        let textoEnlace = cadenas[0].replace(regex, replacement);
 
-      regex = /\[([^]]+)\]/;
-      if (regex.test(cadenasDelTexto[i])){
-          let regex = /\[|\]/g
-          let replacement = "";
-          let textoProcesado = cadenasDelTexto[i].replace(regex, replacement);
-          replacement = `<a href=${href}>${textoProcesado}</a>`;
-          cadenasDelTexto[i] = replacement;
+        //regex = /\[[^]]+\]/;
+        regex = /\(|\)/g; // Quitamos los paréntesis a la segunda cadena
+        let href = cadenas[1].replace(regex, replacement);
+        replacement = `<a href=${href}>${textoEnlace}</a>`;
+        cadenasDelTexto[i] = replacement;
+
       }
 
       if (i == cadenasDelTexto.length-1){

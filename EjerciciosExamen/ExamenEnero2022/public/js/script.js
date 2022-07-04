@@ -674,10 +674,14 @@ function init() {
                             // Obtenemos la conversión a HTML del texto de la pregunta siempre que la conversión esté activada
                             if (r.result[j].conversionHTML == "true"){
 
-                                const url= `${base}/convierte/${textoPregunta}`;
+                                const url= `${base}/convierte`;
+                                const payload = {
+                                    texto:textoPregunta,
+                                };
                                 const request = {
-                                    method: 'GET', 
+                                    method: 'PUT', 
                                     headers: cabeceras,
+                                    body: JSON.stringify(payload),
                                 };
                                 fetch(url, request)
                                 .then( response => response.json())

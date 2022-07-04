@@ -275,14 +275,14 @@ function actualizarVistaPreguntas(event) {
 
                     for (let i=0; i<bloquePreguntas.length; i++){
                         
-                        let idPregunta = bloquePreguntas[i].getAttribute("data-identificadorbd");
+                        //let idPregunta = bloquePreguntas[i].getAttribute("data-identificadorbd");
                         let pregunta = bloquePreguntas[i].querySelector(".pregunta");
 
                         // Utilizamos el servicio web creado para obtener los textos de las preguntas en markdown
                         // Obtenemos el texto de la pregunta convertido a html por defecto
                         const url= `${base}/convierte`;
-                        payload = {
-                            texto:textoPregunta,
+                        const payload = {
+                            texto:pregunta.innerHTML,
                         };
                         const request = {
                             method: 'PUT', 
@@ -298,24 +298,11 @@ function actualizarVistaPreguntas(event) {
                             }
 
                             if (r.result){
-
                                 pregunta.innerHTML = r.result;
-                                insertAsLastChild(nuevoBloque, pregunta);
-                
-                                insertAsLastChild(nuevoBloque, respuesta);
-                
-                                addCruz(nuevoBloque); // Añadimos el icono de borrado
-                                
-                                let cuestionario = queryAncestorSelector(event.target, "section"); // Nos guardamos una referencia al cuestionario actual
-                                insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la nueva pregunta a dicho cuestionario
                             }
 
                         })
                         .catch( error => window.alert(error) );
-
-
-                        pregunta.innerHTML = r.result[j].textoPregunta;
-
 
                     }
 

@@ -483,12 +483,12 @@ function addPregunta(event){
         let cuestionarioId = section.getAttribute("data-identificadorbd");
 
         event.preventDefault(); // Prevenimos la recarga de la página
-        const url= `${base}/${cuestionarioId}/pregunta`;
+        var url= `${base}/${cuestionarioId}/pregunta`;
         var payload= {
             textoPregunta:enunciado.value,
             respuestaCorrecta:respuestaCorrecta,
         };
-        const request = {
+        var request = {
             method: 'POST', 
             headers: cabeceras,
             body: JSON.stringify(payload),
@@ -528,39 +528,80 @@ function addPregunta(event){
                     respuesta.setAttribute("data-valor", "false");
                 }
 
-                // Obtenemos el texto de la pregunta convertido a html por defecto
-                const url= `${base}/convierte`;
-                payload = {
-                    texto:textoPregunta,
-                };
-                const request = {
-                    method: 'PUT', 
+                // Comprobamos si está activada o no la conversión a HTML
+                url= `${base}/conversionHTML`;
+                request = {
+                    method: 'GET', 
                     headers: cabeceras,
-                    body: JSON.stringify(payload),
                 };
+        
+            
                 fetch(url, request)
                 .then( response => response.json())
                 .then( r => {
-
+            
                     if (r.error != null){
-                        throw new Error("Error al obtener el estado de la conversión HTML: " + r.error)
+                        throw new Error("Error al obtener el estado de conversion HTML: " + r.error)
                     }
-
+            
                     if (r.result){
+            
+                        // Si está activada la conversión a HTML
+                        if (r.result == "true"){
+                            
+                                            // Obtenemos el texto de la pregunta convertido a html por defecto
+                            const url= `${base}/convierte`;
+                            payload = {
+                                texto:textoPregunta,
+                            };
+                            const request = {
+                                method: 'PUT', 
+                                headers: cabeceras,
+                                body: JSON.stringify(payload),
+                            };
+                            fetch(url, request)
+                            .then( response => response.json())
+                            .then( r => {
 
-                        pregunta.innerHTML = r.result;
-                        insertAsLastChild(nuevoBloque, pregunta);
-        
-                        insertAsLastChild(nuevoBloque, respuesta);
-        
-                        addCruz(nuevoBloque); // Añadimos el icono de borrado
-                        
-                        let cuestionario = queryAncestorSelector(event.target, "section"); // Nos guardamos una referencia al cuestionario actual
-                        insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la nueva pregunta a dicho cuestionario
+                                if (r.error != null){
+                                    throw new Error("Error al obtener el estado de la conversión HTML: " + r.error)
+                                }
+
+                                if (r.result){
+
+                                    pregunta.innerHTML = r.result;
+                                    insertAsLastChild(nuevoBloque, pregunta);
+                    
+                                    insertAsLastChild(nuevoBloque, respuesta);
+                    
+                                    addCruz(nuevoBloque); // Añadimos el icono de borrado
+                                    
+                                    let cuestionario = queryAncestorSelector(event.target, "section"); // Nos guardamos una referencia al cuestionario actual
+                                    insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la nueva pregunta a dicho cuestionario
+                                }
+
+                            })
+                            .catch( error => window.alert(error) );
+
+                        } else if (r.result == "false"){ // Si no lo está
+                            
+                            pregunta.innerHTML = textoPregunta;
+                            insertAsLastChild(nuevoBloque, pregunta);
+            
+                            insertAsLastChild(nuevoBloque, respuesta);
+            
+                            addCruz(nuevoBloque); // Añadimos el icono de borrado
+                            
+                            let cuestionario = queryAncestorSelector(event.target, "section"); // Nos guardamos una referencia al cuestionario actual
+                            insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la nueva pregunta a dicho cuestionario
+
+                        }
+            
                     }
-
+            
                 })
                 .catch( error => window.alert(error) );
+
 
             }
 

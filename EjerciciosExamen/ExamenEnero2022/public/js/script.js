@@ -224,11 +224,22 @@ function actualizarVistaPreguntas(event) {
                     radioButton.checked = false;
     
                     // Actualizamos el texto de todas las preguntas 
-                    let preguntas = document.querySelectorAll(".bloque"); // Obtenemos la referencia de todas las preguntas    
-    
-                    for (let i=0; i<preguntas.length; i++){
+                    let bloquePreguntas = document.querySelectorAll(".bloque"); // Obtenemos la referencia de todas las preguntas    
+
+                    for (let i=0; i<bloquePreguntas.length; i++){
                         
-                        //preguntas.textContent = r.result[]
+                        for (let j=0; j<r.result.length; j++){
+
+                            if (bloquePreguntas[i].getAttribute("data-identificadorbd") == r.result[j].preguntaId){
+
+                                let pregunta = bloquePreguntas[i].querySelector(".pregunta");
+                                console.log(pregunta);
+                                pregunta.innerHTML = r.result[j].textoPregunta;
+
+                            }
+
+                        }
+
                     }
                 }
 

@@ -288,9 +288,9 @@ app.put(config.app.base+'/editarConversionHTML/:nuevoEstado', async (req, res) =
 
     await knex('conversionHTML').update('estadoConversion', req.params.nuevoEstado);
 
-    let textoPreguntas = await knex('preguntas').select('textoPregunta');
+    let preguntas = await knex('preguntas').select(['preguntaId','textoPregunta']);
     
-    res.status(200).send({ result:textoPreguntas,error:null });
+    res.status(200).send({ result:preguntas,error:null });
     
   } catch (error) {
     console.log(`No se pudo modificar el estado de conversion HTML de las preguntas: ${error}`);

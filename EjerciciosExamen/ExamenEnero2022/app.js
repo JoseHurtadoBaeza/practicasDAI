@@ -272,6 +272,31 @@ app.get(config.app.base+'/preguntas/:cuestionarioId', async (req, res) => {
   }
 });
 
+// Actualiza el estado de la conversión html de todas las preguntas
+app.put(config.app.base+'/editarConversionHTML/:nuevoEstado', async (req, res) => {
+
+  try {
+
+    // Comprobamos que exista alguna pregunta
+    /*let existe= await existePreguntaPorId(req.params.preguntaId);
+    if (!existe) {
+      res.status(404).send({ result:null,error:`pregunta con id ${req.params.preguntaId} no existente` });
+      return;  
+    }*/
+
+    await knex('preguntas').update('conversionHTML', req.params.nuevoEstado);
+
+    let textoPreguntas = await knex('preguntas').select('textoPregunta');
+    
+    res.status(200).send({ result:textoPreguntas,error:null });
+    
+  } catch (error) {
+    console.log(`No se pudo modificar el estado de conversion HTML de las preguntas: ${error}`);
+    res.status(404).send({ result:null,error:'no se pudo modificar el estado de conversion HTML de las preguntas' });
+  }
+
+});
+
 // Devuelve el texto de la pregunta recibido en markdown a html
 app.put(config.app.base+'/convierte', async (req, res) => {
 

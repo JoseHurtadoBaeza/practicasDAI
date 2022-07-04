@@ -40,7 +40,7 @@ function addRadioButton(nodoMain) {
     label.textContent = "Conversión a HTML";
     let radioButton = document.createElement("input");
     radioButton.setAttribute("type", "radio");
-    radioButton.checked = true; // Por defecto se realiza la conversión a HTML
+    radioButton.setAttribute("checked", "true");
     radioButton.className = "conversion";
     insertAsFirstChild(label, radioButton);
     insertAsFirstChild(nodoMain, label); // Lo insertamos como primer hijo del main
@@ -185,88 +185,82 @@ function borraPregunta(event) {
 
 /* Función que actualiza la vista de las preguntas */
 function actualizarVistaPreguntas(event) {
+    
+        // Obtenemos la información de si el radio button está checked o no
+        let radioButton = event.target;
 
-    let bloquePregunta = queryAncestorSelector(event.target, ".bloque"); // Referencia a la pregunta
-
-    let cuestionario = queryAncestorSelector(bloquePregunta, "section"); // Referencia al cuestionario
-
-    let preguntaId = bloquePregunta.getAttribute("data-identificadorbd"); 
-
-    event.preventDefault();
-    const url= `${base}/pregunta/${preguntaId}`;
-    const payload= {}; 
-    var request = {
-        method: 'DELETE', 
-        headers: cabeceras,
-        body: JSON.stringify(payload),
-    };
-    fetch(url,request)
-    .then( response => response.json() )
-    .then( r => {
-
-        if (r.error != null){
-            throw new Error("Error al borrar la pregunta con id " + preguntaId + ":" + r.error);
-        }
-
-        removeElement(bloquePregunta); // Borramos el bloque con la pregunta
-
-        // Si no quedan preguntas en el cuestionario lo borramos así como su enlace y la descripción
-        if(cuestionario.querySelector(".bloque") == null){
-        
-            let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
-
+        // Si estaba activada la conversión a html la desactivamos
+        if(radioButton.checked == true){
+    
+            //let cuestionarioId = cuestionario.getAttribute("data-identificadorbd"); // Obtenemos el identificador del cuestionario en la BD
+            let nuevoEstado = "false";
+    
             event.preventDefault(); // Evitamos la recarga de la página
-            const url= `${base}/${cuestionarioId}`;
-            const payload= {};
+            const url= `${base}/editarConversionHTML/${nuevoEstado}`;
             var request = {
-                method: 'DELETE', 
+                method: 'PUT', 
                 headers: cabeceras,
-                body: JSON.stringify(payload),
             };
             fetch(url,request)
-            /*.then( response => {
-                if (!response.ok){
-                    throw new Error("No se ha podido establecer la conexión con el servidor")
-                }
-                response.json() 
-            })*/
             .then( response => response.json())
             .then( r  => {
                 
                 if (r.error != null) {
-                    throw new Error("Error al borrar el cuestionario cuyo tema es " + cuestionarioId + ":" + r.error);
+                    throw new Error("Error al actualizar el estado de conversion HTML a falso en las preguntas" + r.error);
+                }
+    
+                if (r.result){
+                    radioButton.checked = false;
+    
+                    // Actualizamos el texto de todas las preguntas 
+                    /*let preguntas = querySelectorAll(".pregunta"); // Obtenemos la referencia de todas las preguntas    
+    
+                    for (let i=0; i<preguntas.length; i++){
+                        
+                        preguntas.textContent = r.result[]
+                    }*/
                 }
 
-                // Nos guardamos todos los enlaces actuales
-                let links = document.querySelectorAll("header nav ul a");
-
-                // Nos guardamos el selector para la comparación
-                let href = "#" + cuestionario.getAttribute("id");
-
-                let encontrado = false;
-
-                // Buscamos el enlace que case con el hrefs
-                for (let i = 0; i < links.length && !encontrado; i++){
-
-                    if(links[i].getAttribute("href") == href){
-
-                        removeElement(queryAncestorSelector(links[i], "li")); // Borramos el elemento li de la lista que contiene el enlace
-                        encontrado = true;
-
-                    }
-
-                }
-
-                removeElement(cuestionario); // Elmininamos el cuestionario
             
             })
             .catch( (error) => window.alert(error) );
+    
+    
+        } else { // Sino estaba activada la volvemos a activar
+    
+            let nuevoEstado = "true";
+    
+            event.preventDefault(); // Evitamos la recarga de la página
+            const url= `${base}/editarConversionHTML/${nuevoEstado}`;
+            var request = {
+                method: 'PUT', 
+                headers: cabeceras,
+            };
+            fetch(url,request)
+            .then( response => response.json())
+            .then( r  => {
+                
+                if (r.error != null) {
+                    throw new Error("Error al actualizar el estado de conversion HTML a true en las preguntas" + r.error);
+                }
+    
+                if (r.result){
+                    radioButton.checked = true;
+    
+                    // Actualizamos el texto de todas las preguntas 
+                    /*let preguntas = querySelectorAll(".pregunta"); // Obtenemos la referencia de todas las preguntas    
+    
+                    for (let i=0; i<preguntas.length; i++){
+                        
+                        preguntas.textContent = r.result[]
+                    }*/
+                }
 
-
+            
+            })
+            .catch( (error) => window.alert(error) );
+    
         }
-
-    })
-    .catch( error => window.alert(error) );
 
 } 
 
@@ -493,6 +487,17 @@ function addPregunta(event){
                 let pregunta = document.createElement("div");
                 pregunta.className = "pregunta";
 
+                let respuesta = document.createElement("div");
+                respuesta.className = "respuesta";
+                
+                // No podemos consultar los valores de las variables externas, así que consultamos el payload
+                if(payload.respuestaCorrecta == "Verdadero"){
+                    respuesta.setAttribute("data-valor", "true");
+                }
+                else if(payload.respuestaCorrecta == "Falso"){
+                    respuesta.setAttribute("data-valor", "false");
+                }
+
                 // Obtenemos el texto de la pregunta convertido a html por defecto
                 const url= `${base}/convierte`;
                 const payload = {
@@ -515,17 +520,6 @@ function addPregunta(event){
 
                         pregunta.innerHTML = r.result;
                         insertAsLastChild(nuevoBloque, pregunta);
-        
-                        let respuesta = document.createElement("div");
-                        respuesta.className = "respuesta";
-                        
-                        // No podemos consultar los valores de las variables externas, así que consultamos el payload
-                        if(payload.respuestaCorrecta == "Verdadero"){
-                            respuesta.setAttribute("data-valor", "true");
-                        }
-                        else if(payload.respuestaCorrecta == "Falso"){
-                            respuesta.setAttribute("data-valor", "false");
-                        }
         
                         insertAsLastChild(nuevoBloque, respuesta);
         

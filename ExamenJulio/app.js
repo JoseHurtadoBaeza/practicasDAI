@@ -211,7 +211,7 @@ app.post(config.app.base+'/:temaId/pregunta', async (req, res) => {
 
     var preguntaId = Math.random().toString(36).substring(7); // Generamos un id aleatorio para la pregunta
 
-    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta,papelera:0 };
+    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta,papelera:"false" };
     await knex('preguntas').insert(pregunta);
 
     res.status(200).send({ result:{preguntaId:preguntaId},error:null });

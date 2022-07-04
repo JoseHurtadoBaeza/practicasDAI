@@ -47,6 +47,125 @@ function addBotones(cuestionario){
     botonVaciarPapelera.id = "vaciar";
     botonVaciarPapelera.value = "Vaciar papelera";
     insertAsFirstChild(cuestionario, botonVaciarPapelera);
+    botonVaciarPapelera.addEventListener("click", vaciarPapelera, false); 
+}
+
+function vaciarPapelera(event){
+
+    // Obtenemos la referencia al cuestionario
+    let cuestionario = queryAncestorSelector(event.target, "section");
+    let preguntasPapelera = cuestionario.querySelectorAll(".bloque[data-papelera='true']");
+
+    if(preguntasPapelera.length > 0){
+
+        let cuestionarioId = cuestionario.getAttribute("data-identificadorbd"); // Obtenemos el identificador del cuestionario en la BD
+
+        event.preventDefault(); // Evitamos la recarga de la página
+        const url= `${base}/preguntas/${cuestionarioId}`;
+        const request = {
+            method: 'GET', 
+            headers: cabeceras,
+        };
+        fetch(url,request)
+        .then( response => response.json())
+        .then( r  => {
+            
+            if (r.error != null) {
+                throw new Error("Error al actualizar el estado de colapsado del cuestionario cuyo id es " + cuestionarioId + ":" + r.error);
+            }
+
+            if (r.result){    
+
+                for (let i=0; i<preguntasPapelera.length; i++){
+                    
+                    for (let j=0; j<r.result.length; j++){
+
+                        if (preguntasPapelera[i].getAttribute("data-identificadorbd") == r.result[j].preguntaId){
+
+                            let preguntaId = r.result[j].preguntaId;
+
+                            event.preventDefault();
+                            const url= `${base}/pregunta/${preguntaId}`;
+                            const payload= {}; 
+                            var request = {
+                                method: 'DELETE', 
+                                headers: cabeceras,
+                                body: JSON.stringify(payload),
+                            };
+                            fetch(url,request)
+                            .then( response => response.json() )
+                            .then( r => {
+
+                            if (r.error != null){
+                                throw new Error("Error al borrar la pregunta con id " + preguntaId + ":" + r.error);
+                            }
+                                
+                                removeElement(preguntasPapelera[i]); // Borramos el bloque con la pregunta definitivamente
+
+                                if(cuestionario.querySelector(".bloque") == null){
+    
+                                    let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
+
+                                    event.preventDefault(); // Evitamos la recarga de la página
+                                    const url= `${base}/${cuestionarioId}`;
+                                    const payload= {};
+                                    var request = {
+                                        method: 'DELETE', 
+                                        headers: cabeceras,
+                                        body: JSON.stringify(payload),
+                                    };
+                                    fetch(url,request)
+                                    .then( response => response.json())
+                                    .then( r  => {
+                                        
+                                        if (r.error != null) {
+                                            throw new Error("Error al borrar el cuestionario cuyo tema es " + cuestionarioId + ":" + r.error);
+                                        }
+
+                                        // Nos guardamos todos los enlaces actuales
+                                        let links = document.querySelectorAll("header nav ul a");
+
+                                        // Nos guardamos el selector para la comparación
+                                        let href = "#" + cuestionario.getAttribute("id");
+
+                                        let encontrado = false;
+
+                                        // Buscamos el enlace que case con el hrefs
+                                        for (let i = 0; i < links.length && !encontrado; i++){
+
+                                            if(links[i].getAttribute("href") == href){
+
+                                                removeElement(queryAncestorSelector(links[i], "li")); // Borramos el elemento li de la lista que contiene el enlace
+                                                encontrado = true;
+
+                                            }
+
+                                        }
+
+                                        removeElement(cuestionario); // Elmininamos el cuestionario
+                                    
+                                    })
+                                    .catch( (error) => window.alert(error) );
+
+
+                                }
+
+                            })
+                            .catch( (error) => window.alert(error) );
+
+                        }
+
+                    }
+
+                }
+
+            }
+        
+        })
+        .catch( (error) => window.alert(error) );
+
+    }
+
 }
 
 function restaurarPreguntas(event){
@@ -217,7 +336,7 @@ function borraPregunta(event) {
         .catch( (error) => window.alert(error) );
 
         // Si no quedan preguntas en el cuestionario lo borramos así como su enlace y la descripción
-        if(cuestionario.querySelector(".bloque") == null){
+        /*if(cuestionario.querySelector(".bloque") == null){
         
             let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
 
@@ -263,7 +382,7 @@ function borraPregunta(event) {
             .catch( (error) => window.alert(error) );
 
 
-        }
+        }*/
 
 } 
 

@@ -123,12 +123,6 @@ function borraPregunta(event) {
                 body: JSON.stringify(payload),
             };
             fetch(url,request)
-            /*.then( response => {
-                if (!response.ok){
-                    throw new Error("No se ha podido establecer la conexión con el servidor")
-                }
-                response.json() 
-            })*/
             .then( response => response.json())
             .then( r  => {
                 
@@ -372,6 +366,10 @@ function addPregunta(event){
             headers: cabeceras,
             body: JSON.stringify(payload),
         };
+
+        let textoPregunta = enunciado.value;
+        let respuestaCorrect = respuestaCorrecta;
+
         fetch(url,request)
         .then( response => response.json() )
         .then( r => {
@@ -389,17 +387,17 @@ function addPregunta(event){
 
                 let pregunta = document.createElement("div");
                 pregunta.className = "pregunta";
-                pregunta.innerHTML = payload.textoPregunta; // Obtenemos el valor del payload, porque no podemos acceder al valor de las variables externas
+                pregunta.innerHTML = textoPregunta; // Obtenemos el valor del payload, porque no podemos acceder al valor de las variables externas
                 insertAsLastChild(nuevoBloque, pregunta);
 
                 let respuesta = document.createElement("div");
                 respuesta.className = "respuesta";
                 
                 // No podemos consultar los valores de las variables externas, así que consultamos el payload
-                if(payload.respuestaCorrecta == "Verdadero"){
+                if(respuestaCorrect == "Verdadero"){
                     respuesta.setAttribute("data-valor", "true");
                 }
-                else if(payload.respuestaCorrecta == "Falso"){
+                else if(respuestaCorrect == "Falso"){
                     respuesta.setAttribute("data-valor", "false");
                 }
 
@@ -477,12 +475,6 @@ function addCuestionario(event) {
             body: JSON.stringify(payload),
         };
         fetch(url,request)
-        /*.then( response => {
-            if (!response.ok){
-                throw new Error("No se ha podido establecer la conexión con el servidor")
-            }
-            response.json() 
-        })*/
         .then( response => response.json())
         .then( r => {
             if (r.error != null){

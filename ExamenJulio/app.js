@@ -51,6 +51,7 @@ async function creaEsquema(res) {
         table.integer('temaId').notNullable();
         table.string('textoPregunta', 100).notNullable();
         table.integer('respuestaCorrecta').notNullable(); // Verdadero/True es 1 y Falso/False es 0
+        table.integer('papelera').notNullable();
 
         // Definimos la clave ajena:
         table.foreign('temaId').references('cuestionarios.cuestionarioId');
@@ -210,7 +211,7 @@ app.post(config.app.base+'/:temaId/pregunta', async (req, res) => {
 
     var preguntaId = Math.random().toString(36).substring(7); // Generamos un id aleatorio para la pregunta
 
-    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta };
+    var pregunta = { preguntaId:preguntaId,temaId:req.params.temaId,textoPregunta:req.body.textoPregunta,respuestaCorrecta:req.body.respuestaCorrecta,papelera:0 };
     await knex('preguntas').insert(pregunta);
 
     res.status(200).send({ result:{preguntaId:preguntaId},error:null });
@@ -262,7 +263,7 @@ app.get(config.app.base+'/preguntas/:cuestionarioId', async (req, res) => {
       return;
     }*/
 
-    let preguntasYrespuestas = await knex('preguntas').select(['preguntaId','textoPregunta','respuestaCorrecta'])
+    let preguntasYrespuestas = await knex('preguntas').select(['preguntaId','textoPregunta','respuestaCorrecta','papelera'])
                                   .where('temaId',req.params.cuestionarioId);
     res.status(200).send({ result:preguntasYrespuestas,error:null });
   } catch (error) {
@@ -294,6 +295,34 @@ app.delete(config.app.base+'/pregunta/:preguntaId', async (req, res) => {
 
 });
 
+app.put(config.app.base+'/editarPapelera/:preguntaId', async (req, res) => {
+
+  // Comprobamos que en el body venga el nuevo estado de colapsada de la pregunta
+  if (req.body.papelera == "0" || req.body.papalera == "1") {
+    res.status(404).send({ result:null,error:'datos mal formados para modificar la propiedad papelera de una pregunta' });
+    return;
+  }
+
+  try {
+
+    // Comprobamos que exista la pregunta
+    let existe= await existePreguntaPorId(req.params.preguntaId);
+    if (!existe) {
+      res.status(404).send({ result:null,error:`pregunta con id ${req.params.preguntaId} no existente` });
+      return;  
+    }
+
+    await knex('preguntas').update('papelera', req.body.papelera)
+                                .where('preguntaId',req.params.preguntaId);
+
+    res.status(200).send({ result:'ok',error:null });
+    
+  } catch (error) {
+    console.log(`No se pudo modificar el estado de papelera: ${error}`);
+    res.status(404).send({ result:null,error:'no se pudo modificar el estado de papelera de la pregunta' });
+  }
+
+});
 
 // Borrar un cuestionario a partir de su id y todas sus preguntas (DELETE)
 app.delete(config.app.base+'/:cuestionarioId', async (req, res) => {

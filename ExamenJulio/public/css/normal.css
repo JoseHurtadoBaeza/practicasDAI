@@ -95,6 +95,10 @@ section .bloque:before {
     content: "Pregunta " counter(section);
 }
 
+.bloque[data-papelera="true"] {
+    display: none;
+}
+
 .pregunta {
     margin-top: 1ex;
     margin-bottom: 1ex;

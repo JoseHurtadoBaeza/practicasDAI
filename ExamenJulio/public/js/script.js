@@ -34,6 +34,91 @@ function addCruz(nodo) {
 
 }
 
+function addBotones(cuestionario){
+    let botonRestaurar = document.createElement("input");
+    botonRestaurar.type = "button";
+    botonRestaurar.id = "restaurar";
+    botonRestaurar.value = "Restaurar";
+    insertAsFirstChild(cuestionario, botonRestaurar);
+    botonRestaurar.addEventListener("click", restaurarPreguntas, false);
+
+    let botonVaciarPapelera = document.createElement("input");
+    botonVaciarPapelera.type = "button";
+    botonVaciarPapelera.id = "vaciar";
+    botonVaciarPapelera.value = "Vaciar papelera";
+    insertAsFirstChild(cuestionario, botonVaciarPapelera);
+}
+
+function restaurarPreguntas(event){
+
+    // Obtenemos la referencia al cuestionario
+    let cuestionario = queryAncestorSelector(event.target, "section");
+    let preguntasPapelera = cuestionario.querySelectorAll(".bloque[data-papelera='true']");
+
+    if(preguntasPapelera.length > 0){
+
+        let cuestionarioId = cuestionario.getAttribute("data-identificadorbd"); // Obtenemos el identificador del cuestionario en la BD
+
+        event.preventDefault(); // Evitamos la recarga de la página
+        const url= `${base}/preguntas/${cuestionarioId}`;
+        const request = {
+            method: 'GET', 
+            headers: cabeceras,
+        };
+        fetch(url,request)
+        .then( response => response.json())
+        .then( r  => {
+            
+            if (r.error != null) {
+                throw new Error("Error al actualizar el estado de colapsado del cuestionario cuyo id es " + cuestionarioId + ":" + r.error);
+            }
+
+            if (r.result){    
+
+                for (let i=0; i<preguntasPapelera.length; i++){
+                    
+                    for (let j=0; j<r.result.length; j++){
+
+                        if (preguntasPapelera[i].getAttribute("data-identificadorbd") == r.result[j].preguntaId){
+
+                            let preguntaId = r.result[j].preguntaId;
+
+                            event.preventDefault(); // Evitamos la recarga de la página
+                            const url= `${base}/editarPapelera/${preguntaId}`;
+                            const payload= {papelera:"false"};
+                            var request = {
+                                method: 'PUT', 
+                                headers: cabeceras,
+                                body: JSON.stringify(payload),
+                            };
+                            fetch(url,request)
+                            .then( response => response.json())
+                            .then( r  => {
+                                
+                                if (r.error != null) {
+                                    throw new Error("Error al actualizar el estado de papelera de la pregunta cuyo id es " + preguntaId + ":" + r.error);
+                                }
+
+                                preguntasPapelera[i].setAttribute("data-papelera", "false");
+                            
+                            })
+                            .catch( (error) => window.alert(error) );
+
+                        }
+
+                    }
+
+                }
+
+            }
+        
+        })
+        .catch( (error) => window.alert(error) );
+
+    }
+
+}
+
 // FUNCIONES AUXILIARES
 
 /* Inserta el nodo nuevoHijo como último hijo del nodo padre */
@@ -91,7 +176,7 @@ function borraPregunta(event) {
 
     let preguntaId = bloquePregunta.getAttribute("data-identificadorbd"); 
 
-    event.preventDefault();
+    /*event.preventDefault();
     const url= `${base}/pregunta/${preguntaId}`;
     const payload= {}; 
     var request = {
@@ -107,7 +192,29 @@ function borraPregunta(event) {
             throw new Error("Error al borrar la pregunta con id " + preguntaId + ":" + r.error);
         }
 
-        removeElement(bloquePregunta); // Borramos el bloque con la pregunta
+        removeElement(bloquePregunta); // Borramos el bloque con la pregunta*/
+
+        event.preventDefault(); // Evitamos la recarga de la página
+        const url= `${base}/editarPapelera/${preguntaId}`;
+        const payload= {papelera:"true"}; // Mandamos la pregunta a la papelera
+        var request = {
+            method: 'PUT', 
+            headers: cabeceras,
+            body: JSON.stringify(payload),
+        };
+        fetch(url,request)
+        .then( response => response.json())
+        .then( r  => {
+            
+            if (r.error != null) {
+                throw new Error("Error al actualizar el estado de papelera de la pregunta cuyo id es " + preguntaId + ":" + r.error);
+            }
+
+            // Actualizamos el valor del atributo data-destacada de la pregunta
+            bloquePregunta.setAttribute("data-papelera", "true");
+        
+        })
+        .catch( (error) => window.alert(error) );
 
         // Si no quedan preguntas en el cuestionario lo borramos así como su enlace y la descripción
         if(cuestionario.querySelector(".bloque") == null){
@@ -157,9 +264,6 @@ function borraPregunta(event) {
 
 
         }
-
-    })
-    .catch( error => window.alert(error) );
 
 } 
 
@@ -384,6 +488,7 @@ function addPregunta(event){
                 let nuevoBloque = document.createElement("div");
                 nuevoBloque.className = "bloque";
                 nuevoBloque.setAttribute("data-identificadorbd", r.result.preguntaId); // Atributo para guardar el id de la pregunta en la BD
+                nuevoBloque.setAttribute("data-papelera", "false");
 
                 let pregunta = document.createElement("div");
                 pregunta.className = "pregunta";
@@ -484,6 +589,7 @@ function addCuestionario(event) {
             if (r.result){
                 let cuestionarioId = r.result.cuestionarioId;
                 cuestionario.setAttribute("data-identificadorbd", cuestionarioId); // Atributo para guardar el id del cuestionario en la BD
+                addBotones(cuestionario);
                 insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main del html
             }
         })
@@ -534,6 +640,7 @@ function init() {
                 let cuestionario = document.createElement("section");
                 cuestionario.id = r.result[i].tema; // Le añadimos el id
                 cuestionario.setAttribute("data-identificadorbd", r.result[i].cuestionarioId);
+                addBotones(cuestionario);
                 let cuestionarioId = cuestionario.getAttribute("data-identificadorbd");
 
                 insertaCuestionario(cuestionario); // Insertamos el cuestionario en el main
@@ -560,6 +667,12 @@ function init() {
                             let nuevoBloque = document.createElement("div");
                             nuevoBloque.className = "bloque";
                             nuevoBloque.setAttribute("data-identificadorbd", r.result[j].preguntaId); // Atributo para guardar el id de la pregunta en la BD
+                            
+                            if (r.result[j].papelera == "true"){
+                                nuevoBloque.setAttribute("data-papelera", "true");
+                            } else if (r.result[j].papelera == "false"){
+                                nuevoBloque.setAttribute("data-papelera", "false");
+                            }
 
                             let pregunta = document.createElement("div");
                             pregunta.className = "pregunta";

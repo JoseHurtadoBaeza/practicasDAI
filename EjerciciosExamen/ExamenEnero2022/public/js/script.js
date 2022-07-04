@@ -233,7 +233,6 @@ function actualizarVistaPreguntas(event) {
                             if (bloquePreguntas[i].getAttribute("data-identificadorbd") == r.result[j].preguntaId){
 
                                 let pregunta = bloquePreguntas[i].querySelector(".pregunta");
-                                console.log(pregunta);
                                 pregunta.innerHTML = r.result[j].textoPregunta;
 
                             }
@@ -272,12 +271,54 @@ function actualizarVistaPreguntas(event) {
                     radioButton.checked = true;
     
                     // Actualizamos el texto de todas las preguntas 
-                    /*let preguntas = querySelectorAll(".pregunta"); // Obtenemos la referencia de todas las preguntas    
-    
-                    for (let i=0; i<preguntas.length; i++){
+                    let bloquePreguntas = document.querySelectorAll(".bloque"); // Obtenemos la referencia de todas las preguntas    
+
+                    for (let i=0; i<bloquePreguntas.length; i++){
                         
-                        preguntas.textContent = r.result[]
-                    }*/
+                        let idPregunta = bloquePreguntas[i].getAttribute("data-identificadorbd");
+                        let pregunta = bloquePreguntas[i].querySelector(".pregunta");
+
+                        // Utilizamos el servicio web creado para obtener los textos de las preguntas en markdown
+                        // Obtenemos el texto de la pregunta convertido a html por defecto
+                        const url= `${base}/convierte`;
+                        payload = {
+                            texto:textoPregunta,
+                        };
+                        const request = {
+                            method: 'PUT', 
+                            headers: cabeceras,
+                            body: JSON.stringify(payload),
+                        };
+                        fetch(url, request)
+                        .then( response => response.json())
+                        .then( r => {
+
+                            if (r.error != null){
+                                throw new Error("Error al obtener el estado de la conversión HTML: " + r.error)
+                            }
+
+                            if (r.result){
+
+                                pregunta.innerHTML = r.result;
+                                insertAsLastChild(nuevoBloque, pregunta);
+                
+                                insertAsLastChild(nuevoBloque, respuesta);
+                
+                                addCruz(nuevoBloque); // Añadimos el icono de borrado
+                                
+                                let cuestionario = queryAncestorSelector(event.target, "section"); // Nos guardamos una referencia al cuestionario actual
+                                insertAsLastChild(cuestionario, nuevoBloque); // Añadimos la nueva pregunta a dicho cuestionario
+                            }
+
+                        })
+                        .catch( error => window.alert(error) );
+
+
+                        pregunta.innerHTML = r.result[j].textoPregunta;
+
+
+                    }
+
                 }
 
             
@@ -549,7 +590,7 @@ function addPregunta(event){
                         // Si está activada la conversión a HTML
                         if (r.result == "true"){
                             
-                                            // Obtenemos el texto de la pregunta convertido a html por defecto
+                            // Obtenemos el texto de la pregunta convertido a html por defecto
                             const url= `${base}/convierte`;
                             payload = {
                                 texto:textoPregunta,

@@ -458,7 +458,7 @@ function addPregunta(event){
 
         event.preventDefault(); // Prevenimos la recarga de la página
         const url= `${base}/${cuestionarioId}/pregunta`;
-        const payload= {
+        var payload= {
             textoPregunta:enunciado.value,
             respuestaCorrecta:respuestaCorrecta,
         };
@@ -475,9 +475,9 @@ function addPregunta(event){
                 throw new Error("Error al crear la pregunta para el cuestionario con id " + cuestionarioId + ": " + r.error);
             }
 
-            let textoPregunta = payload.textoPregunta; // Accedo al payload porque no he conseguido acceder al valor de una variable externa
-
             if (r.result){
+
+                let questionText = payload.textoPregunta;
 
                 // Generamos el HTML correspondiente a una bloque de pregunta
                 let nuevoBloque = document.createElement("div");
@@ -500,8 +500,8 @@ function addPregunta(event){
 
                 // Obtenemos el texto de la pregunta convertido a html por defecto
                 const url= `${base}/convierte`;
-                const payload = {
-                    texto:textoPregunta,
+                payload = {
+                    texto:questionText,
                 };
                 const request = {
                     method: 'PUT', 
@@ -636,13 +636,42 @@ function init() {
         addFormPregunta(cuestionarios[i]);
     }*/
 
-    let main = document.querySelector("main");
-    addRadioButton(main); // Añadimos el botón para determinar si queremos que se haga o no la conversión al mostrar las preguntas
+
+    var url= `${base}/conversionHTML`;
+    var request = {
+        method: 'GET', 
+        headers: cabeceras,
+    };
+    fetch(url, request)
+    .then( response => response.json())
+    .then( r => {
+
+        if (r.error != null){
+            throw new Error("Error al obtener el estado de conversion HTML: " + r.error)
+        }
+
+        if (r.result){
+
+            if (r.result == "false"){
+
+                let main = document.querySelector("main");
+                addRadioButton(main, "false"); // Añadimos el botón para determinar si queremos que se haga o no la conversión al mostrar las preguntas
+
+            } else if (r.result == "true"){
+
+                let main = document.querySelector("main");
+                addRadioButton(main, "true"); // Añadimos el botón para determinar si queremos que se haga o no la conversión al mostrar las preguntas
+            }
+
+        }
+
+    })
+    .catch( error => window.alert(error) );
 
     // Utilizamos el nuevo servicio para obtener los temas de cuestionarios almacenados en la BD
     // y así poder generar los cuestionarios en el html al cargar la aplicación
-    const url= `${base}/cuestionarios`;
-    const request = {
+    url= `${base}/cuestionarios`;
+    request = {
         method: 'GET', 
         headers: cabeceras,
     };

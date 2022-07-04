@@ -58,6 +58,16 @@ async function creaEsquema(res) {
 
       });
       console.log("Se ha creado la tabla preguntas");
+
+      existeTabla= await knex.schema.hasTable('conversionHTML');
+      if (!existeTabla) {
+        await knex.schema.createTable('conversionHTML', (table) => {
+          table.string('estadoConversion', 10).primary(); // Recibe true o false
+        });
+        var conversion = {estadoConversion: "true"};
+        await knex('conversionHTML').insert(conversion); // Por defecto
+        console.log("Se ha creado la tabla conversionHTML");
+      }
     }
 
   }
@@ -277,14 +287,7 @@ app.put(config.app.base+'/editarConversionHTML/:nuevoEstado', async (req, res) =
 
   try {
 
-    // Comprobamos que exista alguna pregunta
-    /*let existe= await existePreguntaPorId(req.params.preguntaId);
-    if (!existe) {
-      res.status(404).send({ result:null,error:`pregunta con id ${req.params.preguntaId} no existente` });
-      return;  
-    }*/
-
-    await knex('preguntas').update('conversionHTML', req.params.nuevoEstado);
+    await knex('conversionHTML').update('estadoConversion', req.params.nuevoEstado);
 
     let textoPreguntas = await knex('preguntas').select('textoPregunta');
     
@@ -296,6 +299,23 @@ app.put(config.app.base+'/editarConversionHTML/:nuevoEstado', async (req, res) =
   }
 
 });
+
+// Obtiene el estado de conversión html actual
+app.get(config.app.base+'/conversionHTML', async (req, res) => {
+
+  try {
+
+    let conversionHTML = await knex('conversionHTML').select('estadoConversion');
+    
+    res.status(200).send({ result:conversionHTML,error:null });
+    
+  } catch (error) {
+    console.log(`No se pudo obtener el estado de conversion HTML de las preguntas: ${error}`);
+    res.status(404).send({ result:null,error:'no se pudo obtener el estado de conversion HTML de las preguntas' });
+  }
+
+});
+
 
 // Devuelve el texto de la pregunta recibido en markdown a html
 app.put(config.app.base+'/convierte', async (req, res) => {
